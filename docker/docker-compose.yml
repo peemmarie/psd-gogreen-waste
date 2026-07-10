@@ -1,0 +1,14 @@
+services:
+  tlm-crm:
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    container_name: tlm-crm
+    env_file:
+      - ../.env
+    image: ${REGISTRY}/${IMAGE_NAME}:${VERSION}
+    ports:
+      - 3000:3000

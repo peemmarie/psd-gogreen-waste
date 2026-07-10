@@ -1,0 +1,122 @@
+
+> tlm-crm@0.1.0 lint
+> eslint
+
+
+D:\work\codes\tlm\tlm-crm\next-env.d.ts
+  3:8  error  Replace `"./.next/dev/types/routes.d.ts";` with `'./.next/dev/types/routes.d.ts'`  prettier/prettier
+
+D:\work\codes\tlm\tlm-crm\src\components\app-sidebar.tsx
+   7:3  warning  'BarChartIcon' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  14:3  warning  'FolderIcon' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  17:3  warning  'ListIcon' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+  21:3  warning  'UsersIcon' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+
+D:\work\codes\tlm\tlm-crm\src\components\data-display\filter-bar\filter-options.tsx
+  128:16  error  'month' is not defined          no-undef
+  129:24  error  'onMonthChange' is not defined  no-undef
+  130:23  error  'onYearChange' is not defined   no-undef
+  131:15  error  'year' is not defined           no-undef
+
+D:\work\codes\tlm\tlm-crm\src\components\data-display\table\table-component.tsx
+  174:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+D:\work\codes\tlm\tlm-crm\src\components\data-display\table\table-component.tsx:174:17
+  172 |   }, [showRowNumber, rowNumberColumn, columns, t])
+  173 |
+> 174 |   const table = useReactTable<TData>({
+      |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  175 |     autoResetPageIndex: false,
+  176 |     columns: finalColumns,
+  177 |     data: dataSource ?? fallbackData,  react-hooks/incompatible-library
+
+D:\work\codes\tlm\tlm-crm\src\components\ui\chart.tsx
+  73:7  error  Expected a function declaration  func-style
+
+D:\work\codes\tlm\tlm-crm\src\components\ui\navigation-menu.tsx
+  84:11  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+D:\work\codes\tlm\tlm-crm\src\components\ui\navigation-menu.tsx:84:11
+  82 |   return (
+  83 |     <NavigationMenuPrimitive.Icon
+> 84 |       {...props}
+     |           ^^^^^ Cannot access ref value during render
+  85 |       className={cn(
+  86 |         'data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden',
+  87 |         className  react-hooks/refs
+  90:12  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+D:\work\codes\tlm\tlm-crm\src\components\ui\navigation-menu.tsx:90:12
+  88 |       )}
+  89 |       data-slot="navigation-menu-indicator"
+> 90 |       ref={props.ref as unknown as React.Ref<HTMLDivElement>}
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  91 |     >
+  92 |       <div className="bg-border relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md" />
+  93 |     </NavigationMenuPrimitive.Icon>    react-hooks/refs
+
+D:\work\codes\tlm\tlm-crm\src\components\ui\sonner.tsx
+  13:7  error  Expected a function declaration  func-style
+
+D:\work\codes\tlm\tlm-crm\src\features\dashboard\components\data-table.tsx
+  111:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+D:\work\codes\tlm\tlm-crm\src\features\dashboard\components\data-table.tsx:111:17
+  109 |   const [rowSelection, setRowSelection] = React.useState({})
+  110 |
+> 111 |   const table = useReactTable({
+      |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  112 |     columns,
+  113 |     data,
+  114 |     getCoreRowModel: getCoreRowModel(),  react-hooks/incompatible-library
+
+D:\work\codes\tlm\tlm-crm\src\features\example\component-example.tsx
+  111:9  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\work\codes\tlm\tlm-crm\src\features\meters\meter-parameter-cards.tsx
+  6:3  warning  'IconBoltOff' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\work\codes\tlm\tlm-crm\src\features\meters\meter-table.tsx
+  23:9  error  Expected a function declaration  func-style
+
+D:\work\codes\tlm\tlm-crm\src\features\meters\realtime-display.tsx
+  44:9  error  Expected a function declaration  func-style
+  57:9  error  Expected a function declaration  func-style
+
+D:\work\codes\tlm\tlm-crm\src\hooks\use-mobile.ts
+  16:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\work\codes\tlm\tlm-crm\src\hooks\use-mobile.ts:16:5
+  14 |
+  15 |     mql.addEventListener('change', onChange)
+> 16 |     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |     return () => mql.removeEventListener('change', onChange)
+  18 |   }, [])
+  19 |  react-hooks/set-state-in-effect
+
+D:\work\codes\tlm\tlm-crm\src\hooks\use-mobile.tsx
+  0:0  error  Parsing error: D:\work\codes\tlm\tlm-crm\src\hooks\use-mobile.tsx was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+D:\work\codes\tlm\tlm-crm\src\lib\auth\index.ts
+  12:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  54:11  error    Unexpected console statement              no-console
+
+✖ 25 problems (15 errors, 10 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

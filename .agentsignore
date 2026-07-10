@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.git/
+out/
+build/
+coverage/
+.env
+
+# Build artifacts
+*.tsbuildinfo
+*.log
+.eslintrc_output.json
+lint_output.txt
+
+# Lockfiles (optional, uncomment if you don't want agents to read lockfiles)
+bun.lock
+
