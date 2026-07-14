@@ -1,12 +1,8 @@
 import type { Metadata } from 'next'
 
-import { WasteSortGamePage } from '~/components/pages/waste-sort/game-page'
+export { GameHubPage as default } from '~/components/pages/go-green-games/game-hub-page'
 
 export const metadata: Metadata = {
-  description: 'ฝึกคัดแยกขยะลงถัง 4 สีให้ถูกต้อง',
-  title: 'เกมแยกขยะ 4 สี',
-}
-
-export default function GamePage() {
-  return <WasteSortGamePage />
+  description: 'ศูนย์เกมภารกิจสีเขียวสำหรับ Go Green',
+  title: 'Go Green Games',
 }

@@ -1,19 +1,37 @@
 .game {
-  --sky: #a8d9e8;
-  --grass: #79b878;
+  --sky: #c9eee7;
+  --grass: #70b96e;
   --ink: #173d2a;
   position: relative;
   min-height: 100dvh;
   overflow: hidden;
   color: var(--ink);
-  background: linear-gradient(
-    to bottom,
-    var(--sky) 0 58%,
-    #b5d9a5 58% 61%,
-    var(--grass) 61% 100%
-  );
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 243, 168, 0.52), transparent 18%),
+    radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.54), transparent 20%),
+    linear-gradient(
+      to bottom,
+      var(--sky) 0 56%,
+      #9bd18c 56% 59%,
+      var(--grass) 59% 100%
+    );
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.game::before {
+  position: absolute;
+  right: -8%;
+  bottom: 16%;
+  left: -8%;
+  height: 18%;
+  content: '';
+  opacity: 0.28;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(ellipse at 20% 100%, #4f9c58 0 36%, transparent 37%),
+    radial-gradient(ellipse at 52% 100%, #5eaa61 0 42%, transparent 43%),
+    radial-gradient(ellipse at 83% 100%, #4b9655 0 34%, transparent 35%);
 }
 
 .game::after {
@@ -21,10 +39,12 @@
   right: 0;
   bottom: 0;
   left: 0;
-  height: 11%;
+  height: 14%;
   content: '';
-  opacity: 0.4;
-  background: rgba(34, 99, 53, 0.2);
+  opacity: 0.45;
+  background:
+    linear-gradient(90deg, transparent 0 7%, rgba(255, 255, 255, 0.16) 7% 8%, transparent 8% 18%),
+    rgba(34, 99, 53, 0.18);
 }
 
 .sun {
@@ -158,11 +178,12 @@
   height: clamp(148px, 23vh, 210px);
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: end;
-  gap: clamp(4px, 2vw, 24px);
-  padding: 0 clamp(6px, 3vw, 32px) 14px;
+  gap: clamp(8px, 2.4vw, 34px);
+  padding: 0 clamp(10px, 4vw, 44px) 18px;
 }
 
 .binButton {
+  position: relative;
   display: flex;
   min-width: 0;
   cursor: pointer;
@@ -177,9 +198,20 @@
     filter 180ms ease-out;
 }
 
+.binButton::after {
+  width: min(150px, 82%);
+  height: 14px;
+  margin-top: -4px;
+  content: '';
+  opacity: 0.28;
+  border-radius: 50%;
+  background: rgba(18, 53, 35, 0.42);
+  filter: blur(4px);
+}
+
 .binButton[data-active='true'] .binBody {
-  outline: 3px solid rgba(255, 255, 255, 0.9);
-  outline-offset: 3px;
+  outline: 3px solid rgba(255, 255, 255, 0.72);
+  outline-offset: 5px;
 }
 
 .binButton:focus-visible {
@@ -189,48 +221,112 @@
 }
 
 .binButton[data-over='true'] {
-  transform: translateY(-10px) scale(1.06);
+  transform: translateY(-14px) scale(1.06);
   filter: brightness(1.08);
+}
+
+.binButton[data-over='true']::after {
+  opacity: 0.36;
+  transform: scaleX(1.1);
+}
+
+.binButton[data-over='true'] .binLid {
+  transform: translateY(-20px) rotate(-13deg);
+}
+
+.binButton[data-over='true'] .binBody {
+  box-shadow:
+    inset 14px 0 18px rgba(255, 255, 255, 0.16),
+    inset -18px -18px 28px rgba(0, 0, 0, 0.2),
+    0 18px 30px rgba(22, 65, 41, 0.28),
+    0 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 .binBody {
   position: relative;
   display: flex;
   width: 100%;
-  max-width: 150px;
-  height: clamp(78px, 13vh, 118px);
+  max-width: 170px;
+  height: clamp(92px, 15vh, 136px);
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 12px;
-  border: 3px solid rgba(0, 0, 0, 0.12);
-  border-radius: 7px 7px 18px 18px;
+  padding-bottom: 18px;
+  overflow: visible;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px 10px 24px 24px;
   color: white;
+  background-image:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.2), transparent 34%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.08));
   box-shadow:
-    inset 0 -12px 16px rgba(0, 0, 0, 0.14),
-    0 8px 14px rgba(22, 65, 41, 0.2);
-  transition: transform 150ms ease;
+    inset 14px 0 18px rgba(255, 255, 255, 0.12),
+    inset -16px -18px 26px rgba(0, 0, 0, 0.18),
+    0 12px 22px rgba(22, 65, 41, 0.22);
+  transform-style: preserve-3d;
+  transition:
+    box-shadow 180ms ease,
+    transform 150ms ease;
+}
+
+.binBody::before {
+  position: absolute;
+  top: 12px;
+  right: 16%;
+  left: 16%;
+  height: 10px;
+  content: '';
+  opacity: 0.24;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.binBody::after {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  bottom: 0;
+  width: 28%;
+  content: '';
+  opacity: 0.18;
+  border-radius: 0 10px 24px 0;
+  background: rgba(0, 0, 0, 0.28);
+  pointer-events: none;
 }
 
 .binLid {
   position: absolute;
-  top: -11px;
-  right: -4px;
-  left: -4px;
-  height: 17px;
-  border-radius: 7px;
+  z-index: 2;
+  top: -18px;
+  right: -7px;
+  left: -7px;
+  height: 28px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
   background: inherit;
-  filter: brightness(0.78);
+  box-shadow:
+    inset 0 8px 10px rgba(255, 255, 255, 0.14),
+    inset 0 -8px 8px rgba(0, 0, 0, 0.16),
+    0 6px 10px rgba(22, 65, 41, 0.2);
+  filter: brightness(0.9);
+  transform-origin: left center;
+  transition:
+    transform 220ms cubic-bezier(0.2, 1.35, 0.32, 1),
+    filter 160ms ease;
 }
 
 .binIcon {
-  font-size: clamp(24px, 4vw, 36px);
+  position: relative;
+  z-index: 1;
+  font-size: clamp(28px, 4vw, 42px);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .binLabel {
-  margin-top: 7px;
-  font-size: clamp(11px, 1.7vw, 14px);
+  margin-top: 10px;
+  font-size: clamp(12px, 1.7vw, 15px);
   font-weight: 700;
   line-height: 1.1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .binDescription {
@@ -266,6 +362,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
   pointer-events: none;
 }
@@ -290,20 +387,34 @@
   font-weight: 700;
 }
 
+.hudItemWarning {
+  color: #6b2f17;
+  border-color: rgba(212, 98, 43, 0.5);
+  background: #fff3a8;
+  box-shadow: 0 0 0 3px rgba(212, 98, 43, 0.16);
+}
+
+.hudItemWarning .hudValue {
+  color: #d4622b;
+}
+
 .homeLink {
   position: absolute;
   z-index: 35;
   top: 14px;
   left: 14px;
   display: inline-flex;
-  width: 42px;
-  height: 42px;
+  min-height: 42px;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
   border: 1px solid rgba(23, 61, 42, 0.14);
-  border-radius: 50%;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 12px rgba(25, 69, 45, 0.1);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .homeLink:focus-visible {
@@ -316,13 +427,37 @@
   z-index: 40;
   top: 74px;
   left: 50%;
+  width: max-content;
+  max-width: min(680px, calc(100vw - 32px));
   padding: 8px 18px;
   transform: translateX(-50%);
+  text-align: center;
   border-radius: 999px;
   background: #fff;
   box-shadow: 0 6px 18px rgba(22, 65, 41, 0.16);
   font-weight: 700;
+  line-height: 1.45;
   animation: feedback 800ms ease both;
+}
+
+.timeWarning {
+  position: absolute;
+  z-index: 42;
+  top: 116px;
+  left: 50%;
+  width: max-content;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 10px 18px;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #6b2f17;
+  border: 1px solid rgba(212, 98, 43, 0.42);
+  border-radius: 999px;
+  background: #fff3a8;
+  box-shadow: 0 8px 18px rgba(113, 48, 20, 0.18);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .sortPrompt {
@@ -344,6 +479,10 @@
   white-space: nowrap;
 }
 
+.sortPromptBelowWarning {
+  top: 164px;
+}
+
 .overlay {
   position: absolute;
   z-index: 100;
@@ -356,7 +495,7 @@
 }
 
 .panel {
-  width: min(560px, 100%);
+  width: min(760px, 100%);
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
   padding: 30px;
@@ -399,39 +538,128 @@
   font-size: 18px;
 }
 
+.modePicker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 22px;
+  text-align: left;
+}
+
+.modeButton {
+  min-height: 116px;
+  padding: 13px;
+  cursor: pointer;
+  border: 1px solid #d8e5d9;
+  border-radius: 8px;
+  background: #f7fbf4;
+  color: inherit;
+  font: inherit;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.modeButton:hover {
+  border-color: #216c45;
+  transform: translateY(-1px);
+}
+
+.modeButton:focus-visible {
+  outline: 3px solid #f4bd2a;
+  outline-offset: 2px;
+}
+
+.modeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.modeButton[data-active='true'] {
+  border-color: #216c45;
+  background: #eef7ea;
+  box-shadow: inset 0 0 0 1px #216c45;
+}
+
+.modeButton strong {
+  display: block;
+  color: #216c45;
+  font-size: 15px;
+}
+
+.modeButton span {
+  display: block;
+  margin-top: 6px;
+  color: #557164;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.overlayActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.secondaryButton,
 .startButton {
   display: inline-flex;
   min-height: 46px;
-  cursor: pointer;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 0 24px;
-  border: 0;
   border-radius: 6px;
-  background: #216c45;
-  color: white;
   font: inherit;
   font-weight: 700;
+}
+
+.secondaryButton {
+  border: 1px solid #bad0bc;
+  background: white;
+  color: #216c45;
+  box-shadow: 0 5px 0 #d8e5d9;
+}
+
+.secondaryButton:hover {
+  background: #eef7ea;
+}
+
+.startButton {
+  cursor: pointer;
+  border: 0;
+  background: #216c45;
+  color: white;
   box-shadow: 0 5px 0 #164b30;
 }
 
+.secondaryButton:active,
 .startButton:active {
   transform: translateY(3px);
+}
+
+.secondaryButton:active {
+  box-shadow: 0 2px 0 #d8e5d9;
+}
+
+.startButton:active {
   box-shadow: 0 2px 0 #164b30;
 }
+.secondaryButton:focus-visible,
 .startButton:focus-visible {
   outline: 3px solid #f4bd2a;
   outline-offset: 3px;
 }
-.finalScore {
+.finalResult {
   margin-top: 12px;
   color: #216c45;
   font-size: 52px;
   font-weight: 700;
   line-height: 1;
 }
-.bestScore {
+.roundResult {
   margin: 8px 0 18px;
   color: #557164;
 }
@@ -473,6 +701,17 @@
   display: flex;
   flex-direction: column;
   list-style: none;
+}
+
+.perfectSummary {
+  margin: 0 6px 16px;
+  padding: 12px;
+  text-align: center;
+  border-radius: 8px;
+  background: #eef5ec;
+  color: #216c45;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .mistakeItem {
@@ -570,8 +809,24 @@
   .panel {
     padding: 26px 18px;
   }
+  .modePicker {
+    grid-template-columns: 1fr;
+  }
   .sortPrompt {
+    top: 118px;
+  }
+  .timeWarning {
+    top: 142px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .sortPromptBelowWarning {
+    top: 186px;
+  }
+  .feedback {
     top: 102px;
+    border-radius: 8px;
+    font-size: 13px;
   }
 }
 
@@ -583,6 +838,9 @@
   }
 
   .binButton,
+  .binBody,
+  .binLid,
+  .modeButton,
   .waste,
   .wastePosition {
     transition: none;

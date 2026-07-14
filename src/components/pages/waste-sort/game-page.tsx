@@ -26,7 +26,13 @@ import Link from 'next/link'
 
 import { cn } from '~/lib/utils'
 
-import { BIN_DETAILS, type BinColor, WASTE_ITEMS, type WasteItem } from './data'
+import {
+  BIN_DETAILS,
+  type BinColor,
+  getWasteSortingTip,
+  WASTE_ITEMS,
+  type WasteItem,
+} from './data'
 
 import styles from './game.module.css'
 
@@ -35,18 +41,21 @@ type GameAction =
   | { bin: BinColor; id: number; type: 'sort' }
   | { deltaMs: number; pausedId: null | number; type: 'tick' }
   | { id: number; type: 'select' }
+  | { mode: PlayMode; type: 'start' }
   | { type: 'spawn' }
-  | { type: 'start' }
 type GameState = {
+  correctCount: number
   feedback: string
   items: FallingWaste[]
   level: number
   lives: number
   mistakes: Mistake[]
+  mode: PlayMode
   nextId: number
-  score: number
   selectedId: null | number
+  sortedCount: number
   status: GameStatus
+  timeLeftMs: number
 }
 
 type GameStatus = 'idle' | 'over' | 'playing'
@@ -55,17 +64,21 @@ type Mistake = {
   item: WasteItem
   reason: 'missed' | 'wrong-bin'
 }
+type PlayMode = 'challenge' | 'learn' | 'practice'
 
 const INITIAL_STATE: GameState = {
+  correctCount: 0,
   feedback: '',
   items: [],
   level: 1,
   lives: 3,
   mistakes: [],
+  mode: 'challenge',
   nextId: 1,
-  score: 0,
   selectedId: null,
+  sortedCount: 0,
   status: 'idle',
+  timeLeftMs: 30_000,
 }
 
 const BIN_ICONS: Record<BinColor, string> = {
@@ -75,13 +88,58 @@ const BIN_ICONS: Record<BinColor, string> = {
   yellow: '♻️',
 }
 
+const PLAY_MODES: {
+  description: string
+  id: PlayMode
+  label: string
+  levelBoost: number
+  lives: number
+  minSpawnMs: number
+  spawnMs: number
+  speed: number
+  timeLimitMs: null | number
+}[] = [
+  {
+    description: 'ไม่มีจับเวลา เหมาะกับการจำสีถังและอ่านเหตุผล',
+    id: 'learn',
+    label: 'Learn',
+    levelBoost: 0.15,
+    lives: 99,
+    minSpawnMs: 1200,
+    spawnMs: 2100,
+    speed: 2.7,
+    timeLimitMs: null,
+  },
+  {
+    description: 'มีเวลา 45 วินาที ฝึกให้คล่องก่อนลงสนามจริง',
+    id: 'practice',
+    label: 'Practice',
+    levelBoost: 0.32,
+    lives: 5,
+    minSpawnMs: 860,
+    spawnMs: 1700,
+    speed: 3.8,
+    timeLimitMs: 45_000,
+  },
+  {
+    description: 'โหมด 30 วินาทีสำหรับทดสอบความแม่นยำในรอบเดียว',
+    id: 'challenge',
+    label: 'Challenge',
+    levelBoost: 0.55,
+    lives: 3,
+    minSpawnMs: 620,
+    spawnMs: 1450,
+    speed: 5.2,
+    timeLimitMs: 30_000,
+  },
+]
 const WASTE_LANES = [4, 23, 42, 61, 80]
 
 export function WasteSortGamePage() {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE)
   const [activeId, setActiveId] = useState<null | number>(null)
-  const [bestScore, setBestScore] = useState(0)
   const [hoveredId, setHoveredId] = useState<null | number>(null)
+  const [playMode, setPlayMode] = useState<PlayMode>(readInitialPlayMode)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
     useSensor(KeyboardSensor)
@@ -114,11 +172,7 @@ export function WasteSortGamePage() {
   }
 
   function handleStart() {
-    const stored = Number(
-      window.localStorage.getItem('go-green-best-score') ?? 0
-    )
-    setBestScore(Number.isFinite(stored) ? stored : 0)
-    dispatch({ type: 'start' })
+    dispatch({ mode: playMode, type: 'start' })
   }
 
   useEffect(() => {
@@ -139,19 +193,30 @@ export function WasteSortGamePage() {
     if (state.status !== 'playing') return
     const spawnTimer = window.setInterval(
       () => dispatch({ type: 'spawn' }),
-      Math.max(620, 1450 - state.level * 100)
+      Math.max(
+        getPlayModeConfig(state.mode).minSpawnMs,
+        getPlayModeConfig(state.mode).spawnMs - state.level * 80
+      )
     )
     dispatch({ type: 'spawn' })
     return () => window.clearInterval(spawnTimer)
-  }, [state.level, state.status])
-
-  useEffect(() => {
-    if (state.status !== 'over' || state.score <= bestScore) return
-    window.localStorage.setItem('go-green-best-score', String(state.score))
-  }, [bestScore, state.score, state.status])
+  }, [state.level, state.mode, state.status])
 
   const activeItem = state.items.find((item) => item.id === activeId)
   const selectedItem = state.items.find((item) => item.id === state.selectedId)
+  const accuracy =
+    state.sortedCount === 0
+      ? null
+      : Math.round((state.correctCount / state.sortedCount) * 100)
+  const timeLeftSeconds = Math.ceil(state.timeLeftMs / 1000)
+  const activeModeConfig = getPlayModeConfig(state.mode)
+  const timeLabel =
+    activeModeConfig.timeLimitMs === null ? 'ฝึก' : String(timeLeftSeconds)
+  const shouldShowTimeWarning =
+    state.status === 'playing' &&
+    activeModeConfig.timeLimitMs !== null &&
+    timeLeftSeconds <= 10 &&
+    timeLeftSeconds > 0
 
   return (
     <main className={styles.game}>
@@ -160,14 +225,32 @@ export function WasteSortGamePage() {
 
       <Link aria-label="กลับหน้าค้นหาขยะ" className={styles.homeLink} href="/">
         <IconArrowLeft aria-hidden="true" />
+        <span>ย้อนกลับ</span>
       </Link>
 
       <div aria-label="สถานะเกม" className={styles.hud}>
         <div className={styles.hudItem}>
-          คะแนน <span className={styles.hudValue}>{state.score}</span>
+          แยกถูก <span className={styles.hudValue}>{state.correctCount}</span>
         </div>
         <div className={styles.hudItem}>
           เลเวล <span className={styles.hudValue}>{state.level}</span>
+        </div>
+        <div className={styles.hudItem}>
+          โหมด <span className={styles.hudValue}>{activeModeConfig.label}</span>
+        </div>
+        <div
+          className={cn(
+            styles.hudItem,
+            shouldShowTimeWarning && styles.hudItemWarning
+          )}
+        >
+          เวลา <span className={styles.hudValue}>{timeLabel}</span>
+        </div>
+        <div className={styles.hudItem}>
+          แม่นยำ{' '}
+          <span className={styles.hudValue}>
+            {accuracy === null ? '-' : `${accuracy}%`}
+          </span>
         </div>
         <div
           aria-label={`เหลือ ${state.lives} ชีวิต`}
@@ -189,8 +272,20 @@ export function WasteSortGamePage() {
         </div>
       ) : null}
 
+      {shouldShowTimeWarning ? (
+        <div aria-live="assertive" className={styles.timeWarning} role="status">
+          เหลืออีก {timeLeftSeconds} วินาที
+        </div>
+      ) : null}
+
       {selectedItem ? (
-        <div aria-live="polite" className={styles.sortPrompt}>
+        <div
+          aria-live="polite"
+          className={cn(
+            styles.sortPrompt,
+            shouldShowTimeWarning && styles.sortPromptBelowWarning
+          )}
+        >
           เลือกถังให้ “{selectedItem.name}”
         </div>
       ) : null}
@@ -245,7 +340,7 @@ export function WasteSortGamePage() {
         >
           <p className={styles.panelText}>
             ลากขยะลงถังให้ถูกสี หรือแตะขยะหนึ่งครั้งแล้วเลือกถัง
-            ก่อนขยะตกถึงพื้น
+            เลือกโหมดให้เหมาะกับจังหวะการเรียนก่อนเริ่ม
           </p>
           <div className={styles.legend}>
             {(['red', 'green', 'blue', 'yellow'] as const).map((color) => (
@@ -257,6 +352,11 @@ export function WasteSortGamePage() {
               </div>
             ))}
           </div>
+          <PlayModePicker
+            disabled={false}
+            mode={playMode}
+            onChange={setPlayMode}
+          />
         </GameOverlay>
       ) : null}
 
@@ -265,13 +365,25 @@ export function WasteSortGamePage() {
           actionLabel="เล่นอีกครั้ง"
           icon={<IconRefresh aria-hidden="true" />}
           onAction={handleStart}
+          secondaryAction={
+            <Link className={styles.secondaryButton} href="/game">
+              <IconArrowLeft aria-hidden="true" />
+              ย้อนกลับ
+            </Link>
+          }
           title="จบเกม"
         >
-          <div className={styles.finalScore}>{state.score}</div>
-          <div className={styles.bestScore}>
-            คะแนนสูงสุด: {Math.max(bestScore, state.score)}
+          <div className={styles.finalResult}>
+            {state.correctCount}/{state.sortedCount}
           </div>
-          <LearningSummary mistakes={state.mistakes} />
+          <div className={styles.roundResult}>
+            ผลรอบนี้: แยกถูก {state.correctCount} จาก {state.sortedCount} ครั้ง
+          </div>
+          <LearningSummary
+            correctCount={state.correctCount}
+            mistakes={state.mistakes}
+            sortedCount={state.sortedCount}
+          />
         </GameOverlay>
       ) : null}
     </main>
@@ -359,12 +471,14 @@ function GameOverlay({
   children,
   icon,
   onAction,
+  secondaryAction,
   title,
 }: {
   actionLabel: string
   children: React.ReactNode
   icon: React.ReactNode
   onAction: () => void
+  secondaryAction?: React.ReactNode
   title: string
 }) {
   return (
@@ -372,17 +486,33 @@ function GameOverlay({
       <section aria-modal="true" className={styles.panel} role="dialog">
         <h1 className={styles.panelTitle}>{title}</h1>
         {children}
-        <button className={styles.startButton} onClick={onAction} type="button">
-          {icon}
-          {actionLabel}
-        </button>
+        <div className={styles.overlayActions}>
+          {secondaryAction}
+          <button
+            className={styles.startButton}
+            onClick={onAction}
+            type="button"
+          >
+            {icon}
+            {actionLabel}
+          </button>
+        </div>
       </section>
     </div>
   )
 }
 
 function gameReducer(state: GameState, action: GameAction): GameState {
-  if (action.type === 'start') return { ...INITIAL_STATE, status: 'playing' }
+  if (action.type === 'start') {
+    const modeConfig = getPlayModeConfig(action.mode)
+    return {
+      ...INITIAL_STATE,
+      lives: modeConfig.lives,
+      mode: action.mode,
+      status: 'playing',
+      timeLeftMs: modeConfig.timeLimitMs ?? 0,
+    }
+  }
   if (state.status !== 'playing') return state
 
   if (action.type === 'spawn') {
@@ -405,8 +535,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 
   if (action.type === 'tick') {
-    if (state.selectedId !== null) return state
-    const distance = ((5.2 + state.level * 0.55) * action.deltaMs) / 1000
+    const modeConfig = getPlayModeConfig(state.mode)
+    const timeLeftMs =
+      modeConfig.timeLimitMs === null
+        ? state.timeLeftMs
+        : Math.max(0, state.timeLeftMs - action.deltaMs)
+    const timeOver = modeConfig.timeLimitMs !== null && timeLeftMs === 0
+    const distance =
+      ((modeConfig.speed + state.level * modeConfig.levelBoost) *
+        action.deltaMs) /
+      1000
     const movedItems = state.items.map((item) =>
       item.id === action.pausedId || item.id === state.selectedId
         ? item
@@ -414,10 +552,15 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     )
     const missed = movedItems.filter((item) => item.y >= 100)
     const lives = Math.max(0, state.lives - missed.length)
+    const gameOver = (state.mode !== 'learn' && lives === 0) || timeOver
     return {
       ...state,
-      feedback: missed.length ? 'พลาด! เสีย 1 ชีวิต' : state.feedback,
-      items: lives === 0 ? [] : movedItems.filter((item) => item.y < 100),
+      feedback: timeOver
+        ? 'หมดเวลา! ไปดูสรุปผลกัน'
+        : missed.length
+          ? 'พลาด! เสีย 1 ชีวิต'
+          : state.feedback,
+      items: gameOver ? [] : movedItems.filter((item) => item.y < 100),
       lives,
       mistakes: [
         ...state.mistakes,
@@ -428,26 +571,32 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         })),
       ],
       selectedId: null,
-      status: lives === 0 ? 'over' : state.status,
+      status: gameOver ? 'over' : state.status,
+      timeLeftMs,
     }
   }
 
   const item = state.items.find((candidate) => candidate.id === action.id)
   if (!item) return state
   const correct = item.bin === action.bin
-  const score = correct ? state.score + 10 : state.score
-  const lives = correct ? state.lives : Math.max(0, state.lives - 1)
+  const correctCount = correct ? state.correctCount + 1 : state.correctCount
+  const lives =
+    correct || state.mode === 'learn'
+      ? state.lives
+      : Math.max(0, state.lives - 1)
+  const sortedCount = state.sortedCount + 1
 
   return {
     ...state,
+    correctCount,
     feedback: correct
-      ? 'ถูกต้อง +10'
-      : `ยังไม่ใช่ ถัง${BIN_DETAILS[item.bin].colorName}`,
+      ? `ถูกต้อง: ${getWasteSortingTip(item)}`
+      : `ยังไม่ใช่ ถัง${BIN_DETAILS[item.bin].colorName}: ${getWasteSortingTip(item)}`,
     items:
       lives === 0
         ? []
         : state.items.filter((candidate) => candidate.id !== action.id),
-    level: Math.floor(score / 80) + 1,
+    level: Math.floor(correctCount / 8) + 1,
     lives,
     mistakes: correct
       ? state.mistakes
@@ -455,22 +604,48 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           ...state.mistakes,
           { chosenBin: action.bin, item, reason: 'wrong-bin' },
         ],
-    score,
     selectedId: null,
-    status: lives === 0 ? 'over' : state.status,
+    sortedCount,
+    status:
+      (state.mode !== 'learn' && lives === 0) ||
+      (state.mode === 'learn' && sortedCount >= 12)
+        ? 'over'
+        : state.status,
   }
 }
 
-function LearningSummary({ mistakes }: { mistakes: Mistake[] }) {
+function getPlayModeConfig(mode: PlayMode) {
+  return PLAY_MODES.find((item) => item.id === mode) ?? PLAY_MODES[2]
+}
+
+function LearningSummary({
+  correctCount,
+  mistakes,
+  sortedCount,
+}: {
+  correctCount: number
+  mistakes: Mistake[]
+  sortedCount: number
+}) {
+  const accuracy =
+    sortedCount === 0 ? 0 : Math.round((correctCount / sortedCount) * 100)
+
   return (
     <section className={styles.learningSummary}>
       <div className={styles.learningHeading}>
         <IconBulb aria-hidden="true" />
         <div>
           <h2>ทบทวนก่อนเล่นรอบใหม่</h2>
-          <p>จำสีถังของรายการเหล่านี้ไว้ รอบหน้าจะทำได้ดีขึ้น</p>
+          <p>
+            แยกถูก {correctCount} จาก {sortedCount} ครั้ง ความแม่นยำ {accuracy}%
+          </p>
         </div>
       </div>
+      {mistakes.length === 0 ? (
+        <div className={styles.perfectSummary}>
+          เยี่ยมมาก รอบนี้ยังไม่มีรายการที่ต้องทบทวน
+        </div>
+      ) : null}
       <ul className={styles.mistakeList}>
         {mistakes.map((mistake, index) => {
           const correctBin = BIN_DETAILS[mistake.item.bin]
@@ -493,8 +668,8 @@ function LearningSummary({ mistakes }: { mistakes: Mistake[] }) {
                     ? 'ยังไม่ได้แยกก่อนตกถึงพื้น'
                     : `คุณเลือกถัง${chosenBin?.colorName}`}
                   {' แต่ควรลง'}
-                  <strong>ถัง{correctBin.colorName}</strong> เพราะเป็นขยะ
-                  {mistake.item.type}
+                  <strong>ถัง{correctBin.colorName}</strong>{' '}
+                  {getWasteSortingTip(mistake.item)}
                 </p>
               </div>
             </li>
@@ -503,6 +678,45 @@ function LearningSummary({ mistakes }: { mistakes: Mistake[] }) {
       </ul>
     </section>
   )
+}
+
+function PlayModePicker({
+  disabled,
+  mode,
+  onChange,
+}: {
+  disabled: boolean
+  mode: PlayMode
+  onChange: (mode: PlayMode) => void
+}) {
+  return (
+    <section aria-label="เลือกโหมดการเล่น" className={styles.modePicker}>
+      {PLAY_MODES.map((item) => (
+        <button
+          className={styles.modeButton}
+          data-active={mode === item.id}
+          disabled={disabled}
+          key={item.id}
+          onClick={() => onChange(item.id)}
+          type="button"
+        >
+          <strong>{item.label}</strong>
+          <span>{item.description}</span>
+        </button>
+      ))}
+    </section>
+  )
+}
+
+function readInitialPlayMode(): PlayMode {
+  if (typeof window === 'undefined') return 'challenge'
+
+  const mode = new URLSearchParams(window.location.search).get('mode')
+  if (mode === 'learn' || mode === 'practice' || mode === 'challenge') {
+    return mode
+  }
+
+  return 'challenge'
 }
 
 function WasteCard({ item }: { item: WasteItem }) {
