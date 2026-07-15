@@ -1,28 +1,28 @@
 'use client'
 
-import { Switch as SwitchPrimitive } from '@base-ui/react/switch'
+import * as React from 'react'
+
+import * as SwitchPrimitive from '@radix-ui/react-switch'
 
 import { cn } from '~/lib/utils'
 
 function Switch({
   className,
-  size = 'default',
   ...props
-}: {
-  size?: 'default' | 'sm'
-} & SwitchPrimitive.Root.Props) {
+}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
   return (
     <SwitchPrimitive.Root
       className={cn(
-        'data-checked:bg-primary data-unchecked:bg-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 dark:data-unchecked:bg-input/80 peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:ring-[3px] aria-invalid:ring-[3px] data-disabled:cursor-not-allowed data-disabled:opacity-50 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px]',
+        'peer border-border bg-secondary-background focus-visible:ring-ring data-[state=checked]:bg-main data-[state=unchecked]:bg-secondary-background rounded-base inline-flex h-6 w-12 shrink-0 cursor-pointer items-center border-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
-      data-size={size}
       data-slot="switch"
       {...props}
     >
       <SwitchPrimitive.Thumb
-        className="bg-background dark:data-unchecked:bg-foreground dark:data-checked:bg-primary-foreground pointer-events-none block rounded-full ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0"
+        className={cn(
+          'border-border rounded-base pointer-events-none block h-4 w-4 border-2 bg-white ring-0 transition-transform data-[state=checked]:translate-x-6 data-[state=unchecked]:translate-x-1'
+        )}
         data-slot="switch-thumb"
       />
     </SwitchPrimitive.Root>

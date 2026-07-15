@@ -1,54 +1,59 @@
-'use client'
+import * as React from 'react'
 
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
+import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '~/lib/utils'
 
 const badgeVariants = cva(
-  'h-5 gap-1 rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-3! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-colors overflow-hidden group/badge',
+  'inline-flex items-center justify-center rounded-base border-2 border-border px-2.5 py-0.5 text-xs font-base w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] overflow-hidden',
   {
     defaultVariants: {
       variant: 'default',
     },
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80',
-        destructive:
-          'bg-destructive/10 [a]:hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive dark:bg-destructive/20',
-        ghost:
-          'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
-        link: 'text-primary underline-offset-4 hover:underline',
-        outline:
-          'border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80',
+        default: 'bg-main text-main-foreground',
+        neutral: 'bg-secondary-background text-foreground',
+        outline: 'bg-transparent text-foreground',
+        secondary: 'bg-secondary-background text-foreground',
       },
     },
   }
 )
 
 function Badge({
+  asChild = false,
+  children,
   className,
   render,
-  variant = 'default',
+  variant,
   ...props
-}: useRender.ComponentProps<'span'> & VariantProps<typeof badgeVariants>) {
-  return useRender({
-    defaultTagName: 'span',
-    props: mergeProps<'span'>(
-      {
-        className: cn(badgeVariants({ className, variant })),
-      },
-      props
-    ),
-    render,
-    state: {
-      slot: 'badge',
-      variant,
-    },
-  })
+}: {
+  asChild?: boolean
+  render?: React.ReactElement<{
+    children?: React.ReactNode
+    className?: string
+  }>
+} & React.ComponentProps<'span'> &
+  VariantProps<typeof badgeVariants>) {
+  const Comp = asChild || render ? Slot : 'span'
+
+  return (
+    <Comp
+      className={cn(badgeVariants({ variant }), className)}
+      data-slot="badge"
+      {...props}
+    >
+      {render
+        ? React.cloneElement(
+            render,
+            undefined,
+            children ?? render.props.children
+          )
+        : children}
+    </Comp>
+  )
 }
 
 export { Badge, badgeVariants }

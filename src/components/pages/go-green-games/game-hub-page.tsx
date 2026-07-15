@@ -229,12 +229,12 @@ export function GameHubPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-[#f6faf3] text-[#173d2a]">
-      <header className="border-b border-[#d8e5d9] bg-white/90">
+    <main className="min-h-dvh bg-[#f7f8f3] text-[#111111]">
+      <header className="sticky top-0 z-50 border-b border-[#eceee7] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
           <div className="flex flex-wrap items-center gap-3">
             <Button
-              className="border-[#bad0bc] bg-white text-[#216c45] hover:bg-[#eef7ea]"
+              className="rounded-base border-[#e1e1e1] bg-white text-[#111111] hover:bg-[#f7f8f3]"
               nativeButton={false}
               render={<Link href="/" />}
             >
@@ -242,14 +242,14 @@ export function GameHubPage() {
               ย้อนกลับ
             </Button>
             <Link className="flex items-center gap-3 font-bold" href="/">
-              <span className="flex size-10 items-center justify-center rounded-full bg-[#dcefd5] text-[#2e7047]">
+              <span className="rounded-base flex size-10 items-center justify-center bg-[#111111] text-[#5df591]">
                 <IconLeaf aria-hidden="true" />
               </span>
               Go Green
             </Link>
           </div>
           <Button
-            className="bg-[#216c45] hover:bg-[#185437]"
+            className="rounded-base bg-[#5df591] font-bold text-[#111111] hover:bg-[#49db7b]"
             nativeButton={false}
             render={<Link href="/game/waste-sort" />}
           >
@@ -259,21 +259,10 @@ export function GameHubPage() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[320px_1fr]">
-        <aside className="flex flex-col gap-4">
-          <div className="border border-[#d8e5d9] bg-white p-5">
-            <p className="text-sm font-semibold text-[#2e7047]">
-              Learning Platform
-            </p>
-            <h1 className="mt-2 text-3xl leading-tight font-bold">
-              เรียน เล่น และลงมือทำ
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-[#557164]">
-              อ่านเนื้อหาแบบเข้าใจง่าย
-              แล้วฝึกผ่านเกมและภารกิจที่เชื่อมกับชีวิตจริง
-            </p>
-          </div>
+      <LearningHubHero />
 
+      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[340px_1fr]">
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           <LearningPath
             activeModuleId={activeModule.id}
             onSelectModule={selectModule}
@@ -290,7 +279,7 @@ export function GameHubPage() {
                   <button
                     aria-pressed={mode === item.id}
                     className={cn(
-                      'flex items-start gap-3 border border-[#d8e5d9] bg-white p-4 text-left transition-colors hover:border-[#216c45] focus-visible:border-[#216c45] focus-visible:ring-2 focus-visible:ring-[#216c45]/30 focus-visible:outline-none',
+                      'neo-interactive bg-secondary-background flex items-start gap-3 p-4 text-left',
                       mode === item.id && 'border-[#216c45] bg-[#eef7ea]'
                     )}
                     key={item.id}
@@ -318,7 +307,7 @@ export function GameHubPage() {
                 )
               })
             ) : (
-              <div className="border border-[#d8e5d9] bg-white p-4">
+              <div className="neo-card p-4">
                 <p className="font-bold">เริ่มฝึกจากเกมแยกขยะ 4 สี</p>
                 <p className="mt-1 text-sm leading-5 text-[#557164]">
                   บทนี้เป็นพื้นฐานของทุกกิจกรรม จึงเชื่อมไปยังโหมด Learn
@@ -337,7 +326,7 @@ export function GameHubPage() {
 
             {activeModule.id !== 'waste-basics' ? (
               <button
-                className="border border-dashed border-[#bad0bc] bg-[#f7fbf4] p-4 text-left text-sm leading-6 text-[#557164] transition-colors hover:border-[#216c45] focus-visible:border-[#216c45] focus-visible:ring-2 focus-visible:ring-[#216c45]/30 focus-visible:outline-none"
+                className="neo-surface border-dashed bg-[#f7fbf4] p-4 text-left text-sm leading-6 text-[#557164] transition-colors hover:border-[#216c45] focus-visible:border-[#216c45] focus-visible:ring-2 focus-visible:ring-[#216c45]/30 focus-visible:outline-none"
                 onClick={() => selectModule('waste-basics')}
                 type="button"
               >
@@ -352,11 +341,11 @@ export function GameHubPage() {
           <section className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
             <ModuleBrief module={activeModule} />
 
-            <section className="min-h-[640px] border border-[#d8e5d9] bg-white p-5 sm:p-7">
+            <section className="neo-card min-h-[640px] p-5 sm:p-7">
               {activeMode && ActiveIcon ? (
                 <>
                   <div className="mb-6 flex items-start gap-3">
-                    <span className="flex size-11 items-center justify-center rounded-full bg-[#dcefd5] text-[#216c45]">
+                    <span className="rounded-base flex size-11 items-center justify-center bg-[#dcefd5] text-[#216c45]">
                       <ActiveIcon aria-hidden="true" className="size-6" />
                     </span>
                     <div>
@@ -429,7 +418,7 @@ function BingoGame() {
         {BINGO_MISSIONS.map((mission) => (
           <button
             className={cn(
-              'min-h-28 border border-[#d8e5d9] p-4 text-left font-semibold hover:border-[#216c45]',
+              'neo-interactive bg-secondary-background min-h-28 p-4 text-left font-semibold hover:border-[#216c45]',
               checked.includes(mission) && 'border-[#216c45] bg-[#eef7ea]'
             )}
             key={mission}
@@ -510,7 +499,7 @@ function BuilderGame() {
         {item.choices.map((option) => (
           <button
             className={cn(
-              'min-h-20 border border-[#d8e5d9] p-4 text-left text-lg leading-7 font-semibold hover:border-[#216c45]',
+              'neo-interactive bg-secondary-background min-h-20 p-4 text-left text-lg leading-7 font-semibold hover:border-[#216c45]',
               choice === option && correct && 'border-[#216c45] bg-[#eef7ea]',
               choice === option && !correct && 'border-[#d4622b] bg-[#fff5ed]'
             )}
@@ -585,7 +574,7 @@ function CarbonChoiceGame() {
         {choice.options.map((option, optionIndex) => (
           <button
             className={cn(
-              'min-h-36 border border-[#d8e5d9] p-5 text-left text-xl font-bold hover:border-[#216c45]',
+              'neo-interactive bg-secondary-background min-h-36 p-5 text-left text-xl font-bold hover:border-[#216c45]',
               selected === optionIndex &&
                 correct &&
                 'border-[#216c45] bg-[#eef7ea]',
@@ -735,7 +724,7 @@ function getModesForModule(moduleId: LearningModuleId) {
 
 function LearningCycle() {
   return (
-    <section className="border border-[#d8e5d9] bg-white p-5">
+    <section className="neo-card p-5">
       <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-semibold text-[#2e7047]">
@@ -758,16 +747,63 @@ function LearningCycle() {
       <ol className="mt-5 grid gap-3 md:grid-cols-4">
         {LEARNING_STEPS.map((step, index) => (
           <li
-            className="flex items-center gap-3 border border-[#d8e5d9] bg-[#f7fbf4] p-3"
+            className="neo-surface flex items-center gap-3 bg-[#f7fbf4] p-3"
             key={step}
           >
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#dcefd5] text-sm font-bold text-[#216c45]">
+            <span className="rounded-base grid size-8 shrink-0 place-items-center bg-[#dcefd5] text-sm font-bold text-[#216c45]">
               {index + 1}
             </span>
             <span className="text-sm font-semibold">{step}</span>
           </li>
         ))}
       </ol>
+    </section>
+  )
+}
+
+function LearningHubHero() {
+  return (
+    <section className="border-b border-[#eceee7] bg-white">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
+        <div>
+          <p className="rounded-base inline-flex items-center gap-2 bg-[#effff3] px-4 py-2 text-sm font-bold text-[#168542]">
+            <IconSparkles aria-hidden="true" className="size-4" />
+            Learning Platform
+          </p>
+          <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-bold tracking-[-0.03em] text-balance sm:text-7xl">
+            เรียน เล่น และลงมือทำ
+            <span className="block text-[#168542]">ในเส้นทางเดียว</span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#4d5053]">
+            เลือกบทเรียน อ่านสาระสำคัญ
+            แล้วฝึกผ่านเกมที่เชื่อมกับพฤติกรรมสีเขียวในชีวิตจริง
+          </p>
+        </div>
+
+        <div className="bg-[#111111] p-5 text-white">
+          <div className="neo-surface bg-[#5df591] p-5 text-[#111111]">
+            <p className="text-sm font-bold">เส้นทางแนะนำ</p>
+            <h2 className="mt-3 text-3xl font-bold">Learn → Play → Act</h2>
+            <p className="mt-3 text-sm leading-6 text-[#173d2a]">
+              อ่านแนวคิด เล่นกิจกรรม แล้วนำกลับไปใช้กับพฤติกรรมจริงในอาคาร
+            </p>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="neo-flat bg-white/8 p-4">
+              <p className="text-4xl font-bold text-[#5df591]">6</p>
+              <p className="mt-1 text-sm font-semibold text-white/72">
+                บทเรียนสั้นพร้อมกิจกรรม
+              </p>
+            </div>
+            <div className="neo-flat bg-white/8 p-4">
+              <p className="text-4xl font-bold text-white">4</p>
+              <p className="mt-1 text-sm font-semibold text-white/72">
+                ขั้นตอนเรียนรู้จนลงมือทำ
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }
@@ -780,7 +816,7 @@ function LearningPath({
   onSelectModule: (moduleId: LearningModuleId) => void
 }) {
   return (
-    <section className="border border-[#d8e5d9] bg-white p-5">
+    <section className="neo-card p-5">
       <div className="flex items-center gap-2 text-[#216c45]">
         <IconBook aria-hidden="true" className="size-5" />
         <h2 className="font-bold">หลักสูตร Go Green</h2>
@@ -794,14 +830,14 @@ function LearningPath({
               <button
                 aria-pressed={active}
                 className={cn(
-                  'w-full border border-[#d8e5d9] bg-[#f7fbf4] p-3 text-left transition-colors hover:border-[#216c45] focus-visible:border-[#216c45] focus-visible:ring-2 focus-visible:ring-[#216c45]/30 focus-visible:outline-none',
+                  'neo-interactive w-full bg-[#f7fbf4] p-3 text-left transition-colors hover:border-[#216c45] focus-visible:border-[#216c45] focus-visible:ring-2 focus-visible:ring-[#216c45]/30 focus-visible:outline-none',
                   active && 'border-[#216c45] bg-[#eef7ea]'
                 )}
                 onClick={() => onSelectModule(module.id)}
                 type="button"
               >
                 <span className="flex items-start gap-3">
-                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-xs font-bold text-[#216c45]">
+                  <span className="rounded-base grid size-7 shrink-0 place-items-center bg-white text-xs font-bold text-[#216c45]">
                     {index + 1}
                   </span>
                   <span className="min-w-0">
@@ -867,7 +903,7 @@ function MatchingGame() {
       <div className="grid gap-3">
         {MATCHING_ITEMS.map((item) => (
           <article
-            className="grid gap-3 border border-[#d8e5d9] p-4 md:grid-cols-[1fr_220px]"
+            className="neo-surface grid gap-3 p-4 md:grid-cols-[1fr_220px]"
             key={item.item}
           >
             <div className="flex items-center gap-3">
@@ -910,13 +946,13 @@ function MatchingGame() {
 
 function ModuleBrief({ module }: { module: LearningModule }) {
   return (
-    <section className="border border-[#d8e5d9] bg-white p-5 sm:p-7">
+    <section className="neo-card p-5 sm:p-7">
       <div className="flex flex-wrap gap-2">
-        <span className="inline-flex items-center gap-1 rounded-full bg-[#eef7ea] px-3 py-1 text-xs font-bold text-[#216c45]">
+        <span className="rounded-base inline-flex items-center gap-1 bg-[#eef7ea] px-3 py-1 text-xs font-bold text-[#216c45]">
           <IconClock aria-hidden="true" className="size-4" />
           {module.duration}
         </span>
-        <span className="inline-flex rounded-full bg-[#fff3a8] px-3 py-1 text-xs font-bold text-[#604800]">
+        <span className="rounded-base inline-flex bg-[#fff3a8] px-3 py-1 text-xs font-bold text-[#604800]">
           {module.level}
         </span>
       </div>
@@ -932,7 +968,7 @@ function ModuleBrief({ module }: { module: LearningModule }) {
         <ul className="mt-3 grid gap-2">
           {module.keyPoints.map((point) => (
             <li
-              className="flex gap-3 border border-[#d8e5d9] bg-[#f7fbf4] p-3 text-sm leading-6"
+              className="neo-surface flex gap-3 bg-[#f7fbf4] p-3 text-sm leading-6"
               key={point}
             >
               <IconCheck
@@ -945,7 +981,7 @@ function ModuleBrief({ module }: { module: LearningModule }) {
         </ul>
       </div>
 
-      <div className="mt-6 border border-[#e1c7b4] bg-[#fff8f1] p-4">
+      <div className="neo-surface mt-6 bg-[#fff8f1] p-4">
         <h3 className="flex items-center gap-2 font-bold text-[#9a4c22]">
           <IconTarget aria-hidden="true" className="size-5" />
           Challenge หลังอ่าน
@@ -960,7 +996,7 @@ function PracticeIntro({ module }: { module: LearningModule }) {
   return (
     <section className="grid min-h-[520px] place-items-center bg-[#f7fbf4] p-6 text-center">
       <div className="max-w-md">
-        <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#dcefd5] text-[#216c45]">
+        <span className="rounded-base mx-auto flex size-14 items-center justify-center bg-[#dcefd5] text-[#216c45]">
           <IconRecycle aria-hidden="true" className="size-7" />
         </span>
         <p className="mt-5 text-sm font-semibold text-[#2e7047]">
@@ -1033,7 +1069,7 @@ function QuizGame() {
         {question.options.map((option) => (
           <button
             className={cn(
-              'border border-[#d8e5d9] p-4 text-left font-semibold hover:border-[#216c45]',
+              'neo-interactive bg-secondary-background p-4 text-left font-semibold hover:border-[#216c45]',
               selected === option && correct && 'border-[#216c45] bg-[#eef7ea]',
               selected === option && !correct && 'border-[#d4622b] bg-[#fff5ed]'
             )}
@@ -1069,9 +1105,9 @@ function SummaryCard({
   title: string
 }) {
   return (
-    <section className="grid min-h-[420px] place-items-center border border-[#d8e5d9] bg-[#f7fbf4] p-6 text-center">
+    <section className="neo-surface grid min-h-[420px] place-items-center bg-[#f7fbf4] p-6 text-center">
       <div className="max-w-md">
-        <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#dcefd5] text-[#216c45]">
+        <span className="rounded-base mx-auto flex size-14 items-center justify-center bg-[#dcefd5] text-[#216c45]">
           <IconCheck aria-hidden="true" className="size-7" />
         </span>
         <h3 className="mt-5 text-2xl font-bold">{title}</h3>

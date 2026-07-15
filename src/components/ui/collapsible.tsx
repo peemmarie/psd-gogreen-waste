@@ -1,27 +1,49 @@
 'use client'
 
-import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
+import * as React from 'react'
 
-function Collapsible({ ...props }: CollapsiblePrimitive.Root.Props) {
+import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
+
+function Collapsible({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.Root>) {
   return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />
 }
 
-function CollapsibleContent({ ...props }: CollapsiblePrimitive.Panel.Props) {
+function CollapsibleContent({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleContent>) {
   return (
-    <CollapsiblePrimitive.Panel data-slot="collapsible-content" {...props} />
+    <CollapsiblePrimitive.CollapsibleContent
+      data-slot="collapsible-content"
+      {...props}
+    />
   )
 }
 
 function CollapsibleTrigger({
+  children,
+  nativeButton: _nativeButton,
   render,
   ...props
-}: { render?: React.ReactNode } & CollapsiblePrimitive.Trigger.Props) {
+}: {
+  nativeButton?: boolean
+  render?: React.ReactElement<{ children?: React.ReactNode }>
+} & React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleTrigger>) {
   return (
-    <CollapsiblePrimitive.Trigger
+    <CollapsiblePrimitive.CollapsibleTrigger
+      asChild={Boolean(render) || props.asChild}
       data-slot="collapsible-trigger"
-      render={render}
       {...props}
-    />
+    >
+      {render
+        ? React.cloneElement(
+            render,
+            undefined,
+            children ?? render.props.children
+          )
+        : children}
+    </CollapsiblePrimitive.CollapsibleTrigger>
   )
 }
 

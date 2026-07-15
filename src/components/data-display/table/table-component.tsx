@@ -296,16 +296,13 @@ export function TableComp<TData>({
   return (
     <div className="flex flex-col gap-4">
       <div
-        className={cn(
-          'relative overflow-hidden rounded-lg border',
-          wrapperClassName
-        )}
+        className={cn('neo-card relative overflow-hidden', wrapperClassName)}
       >
         {/* Fetching overlay */}
         {isFetching && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/10 backdrop-blur-sm">
+          <div className="bg-secondary-background/80 absolute inset-0 z-30 flex items-center justify-center">
             <div className="flex items-center gap-2">
-              <div className="border-primary size-6 animate-spin rounded-full border-b-2"></div>
+              <div className="border-primary rounded-base size-6 animate-spin border-b-2"></div>
               <span className="text-muted-foreground text-sm">
                 {dataSource?.length > 0
                   ? tTable('updating')
@@ -340,7 +337,7 @@ export function TableComp<TData>({
                           headerCellClass,
                           canSort && 'px-1',
                           isViewColumn &&
-                            'sticky right-0 z-20 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] backdrop-blur-sm'
+                            'sticky right-0 z-20 shadow-[-4px_0_0_var(--border)]'
                         )}
                         colSpan={header.colSpan}
                         key={header.id}
@@ -400,7 +397,7 @@ export function TableComp<TData>({
                             alignmentClass,
                             'whitespace-nowrap',
                             isViewColumn &&
-                              `sticky right-0 z-[9] shadow-[-2px_0_4px_rgba(0,0,0,0.1)] backdrop-blur-sm ${
+                              `sticky right-0 z-[9] shadow-[-4px_0_0_var(--border)] ${
                                 row.index % 2 === 0
                                   ? 'bg-background/95'
                                   : 'bg-muted/95'
@@ -426,7 +423,7 @@ export function TableComp<TData>({
                         <TableCell
                           className={cn(
                             isViewColumn &&
-                              'bg-background/95 sticky right-0 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] backdrop-blur-sm'
+                              'bg-background/95 sticky right-0 z-10 shadow-[-4px_0_0_var(--border)]'
                           )}
                           key={column.id}
                         >
@@ -444,7 +441,7 @@ export function TableComp<TData>({
                   >
                     {emptyState ?? (
                       <div className="flex flex-col items-center justify-center gap-3 py-12">
-                        <div className="bg-muted rounded-full p-4">
+                        <div className="bg-muted rounded-base p-4">
                           <IconDatabaseOff
                             className="text-muted-foreground"
                             size={48}

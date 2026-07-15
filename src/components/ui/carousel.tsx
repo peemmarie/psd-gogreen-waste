@@ -2,10 +2,10 @@
 
 import * as React from 'react'
 
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
@@ -16,6 +16,7 @@ type CarouselContextProps = {
   canScrollNext: boolean
   canScrollPrev: boolean
   carouselRef: ReturnType<typeof useEmblaCarousel>[0]
+  plugins?: CarouselPlugin
   scrollNext: () => void
   scrollPrev: () => void
 } & CarouselProps
@@ -53,7 +54,10 @@ function Carousel({
   const [canScrollNext, setCanScrollNext] = React.useState(false)
 
   const onSelect = React.useCallback((api: CarouselApi) => {
-    if (!api) return
+    if (!api) {
+      return
+    }
+
     setCanScrollPrev(api.canScrollPrev())
     setCanScrollNext(api.canScrollNext())
   }, [])
@@ -80,12 +84,18 @@ function Carousel({
   )
 
   React.useEffect(() => {
-    if (!api || !setApi) return
+    if (!api || !setApi) {
+      return
+    }
+
     setApi(api)
   }, [api, setApi])
 
   React.useEffect(() => {
-    if (!api) return
+    if (!api) {
+      return
+    }
+
     onSelect(api)
     api.on('reInit', onSelect)
     api.on('select', onSelect)
@@ -164,8 +174,8 @@ function CarouselItem({ className, ...props }: React.ComponentProps<'div'>) {
 
 function CarouselNext({
   className,
-  size = 'icon-sm',
-  variant = 'outline',
+  size = 'icon',
+  variant = 'noShadow',
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { canScrollNext, orientation, scrollNext } = useCarousel()
@@ -173,7 +183,7 @@ function CarouselNext({
   return (
     <Button
       className={cn(
-        'absolute touch-manipulation rounded-full',
+        'rounded-base absolute h-8 w-8',
         orientation === 'horizontal'
           ? 'top-1/2 -right-12 -translate-y-1/2'
           : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
@@ -186,7 +196,7 @@ function CarouselNext({
       variant={variant}
       {...props}
     >
-      <IconChevronRight />
+      <ArrowRight />
       <span className="sr-only">Next slide</span>
     </Button>
   )
@@ -194,8 +204,8 @@ function CarouselNext({
 
 function CarouselPrevious({
   className,
-  size = 'icon-sm',
-  variant = 'outline',
+  size = 'icon',
+  variant = 'noShadow',
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { canScrollPrev, orientation, scrollPrev } = useCarousel()
@@ -203,7 +213,7 @@ function CarouselPrevious({
   return (
     <Button
       className={cn(
-        'absolute touch-manipulation rounded-full',
+        'rounded-base absolute size-8',
         orientation === 'horizontal'
           ? 'top-1/2 -left-12 -translate-y-1/2'
           : '-top-12 left-1/2 -translate-x-1/2 rotate-90',
@@ -216,7 +226,7 @@ function CarouselPrevious({
       variant={variant}
       {...props}
     >
-      <IconChevronLeft />
+      <ArrowLeft />
       <span className="sr-only">Previous slide</span>
     </Button>
   )
@@ -239,5 +249,4 @@ export {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  useCarousel,
 }

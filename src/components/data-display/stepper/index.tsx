@@ -88,9 +88,9 @@ function StepNavigation({
           >
             <div className="flex flex-col items-center">
               <div
-                className={`flex size-12 items-center justify-center rounded-full border-2 shadow-sm transition-all duration-200 ${
+                className={`neo-surface flex size-12 items-center justify-center transition-all duration-200 ${
                   activeStep === index
-                    ? 'border-primary bg-primary text-primary-foreground shadow-lg'
+                    ? 'border-primary bg-primary text-primary-foreground shadow-shadow'
                     : activeStep > index
                       ? 'border-primary bg-primary/10 text-primary'
                       : 'border-muted-foreground/20 bg-muted text-muted-foreground'

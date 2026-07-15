@@ -1,50 +1,42 @@
 'use client'
 
-import { PreviewCard as PreviewCardPrimitive } from '@base-ui/react/preview-card'
+import * as React from 'react'
+
+import * as HoverCardPrimitive from '@radix-ui/react-hover-card'
 
 import { cn } from '~/lib/utils'
 
-function HoverCard({ ...props }: PreviewCardPrimitive.Root.Props) {
-  return <PreviewCardPrimitive.Root data-slot="hover-card" {...props} />
+function HoverCard({
+  ...props
+}: React.ComponentProps<typeof HoverCardPrimitive.Root>) {
+  return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />
 }
 
 function HoverCardContent({
   align = 'center',
-  alignOffset = 4,
   className,
-  side = 'bottom',
   sideOffset = 4,
   ...props
-}: Pick<
-  PreviewCardPrimitive.Positioner.Props,
-  'align' | 'alignOffset' | 'side' | 'sideOffset'
-> &
-  PreviewCardPrimitive.Popup.Props) {
+}: React.ComponentProps<typeof HoverCardPrimitive.Content>) {
   return (
-    <PreviewCardPrimitive.Portal data-slot="hover-card-portal">
-      <PreviewCardPrimitive.Positioner
-        align={align}
-        alignOffset={alignOffset}
-        className="isolate z-50"
-        side={side}
-        sideOffset={sideOffset}
-      >
-        <PreviewCardPrimitive.Popup
-          className={cn(
-            'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/10 bg-popover text-popover-foreground z-50 w-64 origin-(--transform-origin) rounded-lg p-4 text-sm shadow-md ring-1 outline-hidden duration-100',
-            className
-          )}
-          data-slot="hover-card-content"
-          {...props}
-        />
-      </PreviewCardPrimitive.Positioner>
-    </PreviewCardPrimitive.Portal>
+    <HoverCardPrimitive.Content
+      align={align}
+      className={cn(
+        'rounded-base border-border bg-main font-base text-main-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-64 origin-(--radix-hover-card-content-transform-origin) border-2 p-4',
+        className
+      )}
+      data-slot="hover-card-content"
+      sideOffset={sideOffset}
+      {...props}
+    />
   )
 }
 
-function HoverCardTrigger({ ...props }: PreviewCardPrimitive.Trigger.Props) {
+function HoverCardTrigger({
+  ...props
+}: React.ComponentProps<typeof HoverCardPrimitive.Trigger>) {
   return (
-    <PreviewCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
+    <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
   )
 }
 

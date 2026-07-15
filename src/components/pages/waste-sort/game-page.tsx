@@ -103,37 +103,38 @@ const PLAY_MODES: {
     description: 'ไม่มีจับเวลา เหมาะกับการจำสีถังและอ่านเหตุผล',
     id: 'learn',
     label: 'Learn',
-    levelBoost: 0.15,
+    levelBoost: 0.25,
     lives: 99,
-    minSpawnMs: 1200,
-    spawnMs: 2100,
-    speed: 2.7,
+    minSpawnMs: 950,
+    spawnMs: 1700,
+    speed: 5.2,
     timeLimitMs: null,
   },
   {
     description: 'มีเวลา 45 วินาที ฝึกให้คล่องก่อนลงสนามจริง',
     id: 'practice',
     label: 'Practice',
-    levelBoost: 0.32,
+    levelBoost: 0.55,
     lives: 5,
-    minSpawnMs: 860,
-    spawnMs: 1700,
-    speed: 3.8,
+    minSpawnMs: 700,
+    spawnMs: 1300,
+    speed: 7.2,
     timeLimitMs: 45_000,
   },
   {
     description: 'โหมด 30 วินาทีสำหรับทดสอบความแม่นยำในรอบเดียว',
     id: 'challenge',
     label: 'Challenge',
-    levelBoost: 0.55,
+    levelBoost: 0.85,
     lives: 3,
-    minSpawnMs: 620,
-    spawnMs: 1450,
-    speed: 5.2,
+    minSpawnMs: 520,
+    spawnMs: 1050,
+    speed: 9.2,
     timeLimitMs: 30_000,
   },
 ]
 const WASTE_LANES = [4, 23, 42, 61, 80]
+const GAME_TICK_MS = 50
 
 export function WasteSortGamePage() {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE)
@@ -172,6 +173,8 @@ export function WasteSortGamePage() {
   }
 
   function handleStart() {
+    setActiveId(null)
+    setHoveredId(null)
     dispatch({ mode: playMode, type: 'start' })
   }
 
@@ -180,11 +183,11 @@ export function WasteSortGamePage() {
     const tickTimer = window.setInterval(
       () =>
         dispatch({
-          deltaMs: 80,
+          deltaMs: GAME_TICK_MS,
           pausedId: activeId ?? hoveredId,
           type: 'tick',
         }),
-      80
+      GAME_TICK_MS
     )
     return () => window.clearInterval(tickTimer)
   }, [activeId, hoveredId, state.status])
@@ -223,10 +226,26 @@ export function WasteSortGamePage() {
       <div aria-hidden="true" className={styles.sun} />
       <div aria-hidden="true" className={styles.cloud} />
 
-      <Link aria-label="กลับหน้าค้นหาขยะ" className={styles.homeLink} href="/">
-        <IconArrowLeft aria-hidden="true" />
-        <span>ย้อนกลับ</span>
-      </Link>
+      <div className={styles.topActions}>
+        <Link
+          aria-label="กลับหน้าค้นหาขยะ"
+          className={styles.homeLink}
+          href="/"
+        >
+          <IconArrowLeft aria-hidden="true" />
+          <span>ย้อนกลับ</span>
+        </Link>
+        {state.status === 'playing' ? (
+          <button
+            className={styles.restartButton}
+            onClick={handleStart}
+            type="button"
+          >
+            <IconRefresh aria-hidden="true" />
+            <span>เริ่มใหม่</span>
+          </button>
+        ) : null}
+      </div>
 
       <div aria-label="สถานะเกม" className={styles.hud}>
         <div className={styles.hudItem}>
