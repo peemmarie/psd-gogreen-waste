@@ -38,11 +38,6 @@ const HERO_BIN_OFFSETS = [
   'translate-y-2',
   'translate-y-4',
 ]
-const HERO_PROOFS = [
-  { label: 'เป้าหมายปี 2569', value: '6' },
-  { label: 'ประเภทถังขยะหลัก', value: '4' },
-  { label: 'แนวทางทำได้ทันที', value: '12' },
-]
 const ENVIRONMENT_TARGETS = [
   {
     icon: IconBolt,
@@ -207,14 +202,14 @@ export function WasteSortSearchPage() {
   }
 
   return (
-    <main className="min-h-dvh overflow-hidden bg-[#f7f8f3] text-[#111111]">
-      <header className="sticky top-0 z-50 border-b border-[#eceee7] bg-white/95 backdrop-blur">
+    <main className="min-h-dvh scroll-pt-24 overflow-x-hidden bg-[#f7f8f3] pt-[73px] text-[#111111]">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#eceee7] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <Link className="flex items-center gap-3 text-lg font-bold" href="/">
-            <span className="flex size-10 items-center justify-center rounded-full bg-[#111111] text-[#5df591]">
+            <span className="rounded-base flex size-10 items-center justify-center bg-[#111111] text-[#5df591]">
               <IconLeaf aria-hidden="true" />
             </span>
-            <span>Go Green</span>
+            <span>PSD GreenHub</span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm font-semibold text-[#4d5053] md:flex">
             <Link className="hover:text-[#111111]" href="#learning">
@@ -232,7 +227,7 @@ export function WasteSortSearchPage() {
           </nav>
           <div className="flex items-center justify-end gap-2">
             <Button
-              className="rounded-full bg-[#5df591] px-5 font-bold text-[#111111] hover:bg-[#49db7b]"
+              className="bg-[#5df591] px-5 font-bold text-[#111111] hover:bg-[#49db7b]"
               nativeButton={false}
               render={<Link href="/game/waste-sort" />}
             >
@@ -276,14 +271,14 @@ function BinGuide() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {(['red', 'green', 'blue', 'yellow'] as const).map((color) => (
           <div
-            className="border border-[#d8e5d9] bg-white px-4 py-6 transition-colors hover:border-[#a9c6ad]"
+            className="neo-card px-4 py-6 transition-colors hover:border-[#a9c6ad]"
             key={color}
           >
             <WasteBin color={color} compact />
           </div>
         ))}
       </div>
-      <div className="mt-8 border border-[#d8e5d9] bg-white p-5 sm:p-6">
+      <div className="neo-card mt-8 p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-[#2e7047]">
@@ -302,15 +297,12 @@ function BinGuide() {
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           {LEARNING_MODULES.slice(0, 3).map((module) => (
-            <article
-              className="border border-[#d8e5d9] bg-[#f7fbf4] p-4"
-              key={module.id}
-            >
+            <article className="neo-surface bg-[#f7fbf4] p-4" key={module.id}>
               <div className="flex flex-wrap gap-2 text-xs font-bold">
-                <span className="rounded-full bg-[#dcefd5] px-2.5 py-1 text-[#216c45]">
+                <span className="rounded-base bg-[#dcefd5] px-2.5 py-1 text-[#216c45]">
                   {module.duration}
                 </span>
-                <span className="rounded-full bg-[#fff3a8] px-2.5 py-1 text-[#604800]">
+                <span className="rounded-base bg-[#fff3a8] px-2.5 py-1 text-[#604800]">
                   {module.level}
                 </span>
               </div>
@@ -332,6 +324,32 @@ function LearningContent() {
       <OrganizationOverview />
 
       <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-5 sm:px-8 sm:py-6">
+        <div className="neo-card mt-5 grid gap-3 p-4 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div>
+            <p className="text-sm font-bold text-[#168542]">
+              มาตรฐานองค์กรสีเขียว
+            </p>
+            <h3 className="mt-1 text-2xl font-bold text-[#111111]">
+              MEA GO Standard
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-[#4d5053]">
+              โครงมาตรฐานที่ช่วยให้การทำงานสีเขียวเป็นระบบเดียวกัน
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {GO_STANDARD_CATEGORIES.map((category, index) => (
+              <div
+                className="neo-surface flex items-start gap-3 bg-[#f7f8f3] p-3"
+                key={category}
+              >
+                <span className="rounded-base flex size-8 shrink-0 items-center justify-center bg-[#5df591] text-sm font-bold text-[#111111]">
+                  {index + 1}
+                </span>
+                <p className="text-sm leading-6 font-semibold">{category}</p>
+              </div>
+            ))}
+          </div>
+        </div>
         <ResourcePracticeSection />
         <StandardsAndTargetsSection />
       </div>
@@ -342,15 +360,17 @@ function LearningContent() {
 function OrganizationOverview() {
   return (
     <section className="bg-white text-[#111111]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:min-h-[640px] lg:grid-cols-[0.96fr_1.04fr] lg:items-center">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-8 sm:px-8 sm:py-10 lg:min-h-[500px] lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.82fr)] lg:items-center">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#effff3] px-4 py-2 text-sm font-bold text-[#168542]">
-            <IconLeaf aria-hidden="true" className="size-4" />
-            MEA Green Organization
-          </p>
           <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-bold tracking-[-0.03em] text-balance sm:text-7xl">
-            Learn, sort,
-            <span className="block">and go green.</span>
+            <span className="relative isolate inline-block px-1 text-[#111111]">
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-[0.03em] z-0 h-[0.52em] bg-[#fe5000]"
+              />
+              <span className="relative z-10">MEA</span>
+            </span>{' '}
+            Green Organization
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-[#4d5053]">
             บริหารพลังงาน ทรัพยากร และของเสียอย่างเป็นระบบ
@@ -358,7 +378,7 @@ function OrganizationOverview() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button
-              className="h-12 rounded-full bg-[#5df591] px-7 text-base font-bold text-[#111111] hover:bg-[#49db7b]"
+              className="rounded-base h-12 bg-[#5df591] px-7 text-base font-bold text-[#111111] hover:bg-[#49db7b]"
               nativeButton={false}
               render={<Link href="#search" />}
             >
@@ -366,7 +386,7 @@ function OrganizationOverview() {
               <IconArrowRight data-icon="inline-end" />
             </Button>
             <Button
-              className="h-12 rounded-full bg-[#111111] px-7 text-base font-bold text-white hover:bg-[#2a2a2a]"
+              className="rounded-base h-12 bg-[#111111] px-7 text-base font-bold text-white hover:bg-[#2a2a2a]"
               nativeButton={false}
               render={<Link href="/game" />}
             >
@@ -375,12 +395,19 @@ function OrganizationOverview() {
           </div>
         </div>
 
-        <div className="relative min-h-[420px] overflow-hidden rounded-[32px] bg-[#111111] p-5 text-white sm:p-7">
-          <div className="absolute top-5 right-5 rounded-full bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
-            Green score
-          </div>
-          <div className="grid h-full content-end gap-4">
-            <div className="rounded-[28px] bg-[#5df591] p-5 text-[#111111]">
+        <div className="neo-surface bg-[#e8f2df] p-5 text-[#111111] sm:p-7">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="rounded-base border-2 border-[#111111] bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
+                Green mission
+              </span>
+              <IconRecycle
+                aria-hidden="true"
+                className="size-8 text-[#216c45]"
+              />
+            </div>
+
+            <div className="neo-surface bg-[#5df591] p-5 text-[#111111]">
               <p className="text-sm font-bold">Mission วันนี้</p>
               <h3 className="mt-3 text-3xl leading-tight font-bold">
                 แยกขยะให้ถูกถัง
@@ -389,42 +416,11 @@ function OrganizationOverview() {
                 ค้นหา เรียนรู้ แล้วเล่นเกมฝึกแยกขยะในเส้นทางเดียว
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-[24px] bg-white p-4 text-[#111111]">
-                <p className="text-4xl font-bold">4</p>
-                <p className="mt-1 text-sm font-semibold text-[#4d5053]">
-                  ถังขยะหลัก
-                </p>
-              </div>
-              <div className="rounded-[24px] bg-[#f4f4ef] p-4 text-[#111111]">
-                <p className="text-4xl font-bold">6</p>
-                <p className="mt-1 text-sm font-semibold text-[#4d5053]">
-                  เป้าหมายสีเขียว
-                </p>
-              </div>
-            </div>
-            <blockquote className="rounded-[24px] border border-white/10 bg-white/8 p-4 text-base leading-7 font-semibold text-white">
+
+            <blockquote className="neo-flat bg-white p-4 text-base leading-7 font-semibold text-[#173d2a]">
               “องค์กรด้านพลังงานที่เป็นมิตรกับสิ่งแวดล้อมอย่างยั่งยืน”
             </blockquote>
           </div>
-        </div>
-      </div>
-
-      <div className="border-y border-[#eceee7] bg-[#f7f8f3]">
-        <div className="mx-auto grid max-w-6xl gap-0 px-5 py-6 sm:grid-cols-3 sm:px-8">
-          {HERO_PROOFS.map((proof) => (
-            <div
-              className="border-b border-[#e1e1e1] py-4 last:border-b-0 sm:border-r sm:border-b-0 sm:px-8 sm:first:pl-0 sm:last:border-r-0"
-              key={proof.label}
-            >
-              <p className="text-5xl leading-none font-bold tracking-[-0.04em]">
-                {proof.value}
-              </p>
-              <p className="mt-2 text-sm font-semibold text-[#4d5053]">
-                {proof.label}
-              </p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
@@ -450,7 +446,7 @@ function ResourcePracticeSection() {
 
           return (
             <article
-              className="grid min-h-56 grid-rows-[auto_1fr_auto] border border-[#e1e1e1] bg-white p-5"
+              className="neo-card grid min-h-56 grid-rows-[auto_1fr_auto] p-5"
               key={section.title}
             >
               <div className="flex items-start justify-between gap-3">
@@ -464,7 +460,7 @@ function ResourcePracticeSection() {
                 </div>
                 <span
                   className={cn(
-                    'flex size-12 shrink-0 items-center justify-center rounded-full',
+                    'rounded-base flex size-12 shrink-0 items-center justify-center',
                     section.iconClass
                   )}
                 >
@@ -505,7 +501,7 @@ function SearchResults({ results }: { results: WasteItem[] }) {
           )
           return (
             <article
-              className="grid gap-5 border border-[#d8e5d9] bg-white p-5 md:grid-cols-[minmax(0,1fr)_112px] md:items-center"
+              className="neo-card grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_112px] md:items-center"
               key={item.name}
             >
               <div>
@@ -543,11 +539,11 @@ function SearchResults({ results }: { results: WasteItem[] }) {
 
 function StandardsAndTargetsSection() {
   return (
-    <section className="overflow-hidden bg-[#111111] text-white">
-      <div className="p-5 sm:p-8">
+    <section className="overflow-hidden text-white">
+      <div className="mb-4 bg-[#111111] p-5 sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
+            <p className="rounded-base inline-flex items-center gap-2 bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
               <IconLeaf aria-hidden="true" className="size-4" />
               เป้าหมายปี 2569
             </p>
@@ -560,36 +556,16 @@ function StandardsAndTargetsSection() {
               ให้เห็นผลเป็นตัวเลขเดียวกันทั้งหน่วยงาน
             </p>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="border border-white/12 bg-white/8 p-4">
-              <p className="text-5xl leading-none font-bold text-[#5df591]">
-                6
-              </p>
-              <p className="mt-2 text-sm font-semibold text-white/72">
-                เป้าหมายที่ต้องติดตาม
-              </p>
-            </div>
-            <div className="border border-white/12 bg-white/8 p-4">
-              <p className="text-5xl leading-none font-bold text-white">2568</p>
-              <p className="mt-2 text-sm font-semibold text-white/72">
-                ปีฐานสำหรับเปรียบเทียบ
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
-      <div className="bg-[#f7f8f3] p-4 text-[#111111] sm:p-5">
+      <div className="bg-[#f7f8f3] text-[#111111]">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ENVIRONMENT_TARGETS.map((target) => {
             const TargetIcon = target.icon
 
             return (
-              <div
-                className="border border-[#e1e1e1] bg-white p-4"
-                key={target.metric}
-              >
+              <div className="neo-card p-4" key={target.metric}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-base leading-6 font-bold text-[#111111]">
@@ -615,33 +591,6 @@ function StandardsAndTargetsSection() {
             )
           })}
         </div>
-
-        <div className="mt-5 grid gap-3 border border-[#e1e1e1] bg-white p-4 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <div>
-            <p className="text-sm font-bold text-[#168542]">
-              มาตรฐานองค์กรสีเขียว
-            </p>
-            <h3 className="mt-1 text-2xl font-bold text-[#111111]">
-              MEA GO Standard
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[#4d5053]">
-              โครงมาตรฐานที่ช่วยให้การทำงานสีเขียวเป็นระบบเดียวกัน
-            </p>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {GO_STANDARD_CATEGORIES.map((category, index) => (
-              <div
-                className="flex items-start gap-3 border border-[#e1e1e1] bg-[#f7f8f3] p-3"
-                key={category}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#5df591] text-sm font-bold text-[#111111]">
-                  {index + 1}
-                </span>
-                <p className="text-sm leading-6 font-semibold">{category}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   )
@@ -657,7 +606,7 @@ function WasteRouteContent() {
         <div className="grid gap-6 lg:grid-cols-[0.74fr_1.26fr]">
           <div className="flex flex-col justify-between gap-8 bg-[#111111] p-6 text-white">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
+              <p className="rounded-base inline-flex items-center gap-2 bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
                 <IconRecycle aria-hidden="true" className="size-4" />
                 เส้นทางการจัดการขยะ
               </p>
@@ -671,13 +620,13 @@ function WasteRouteContent() {
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="border border-white/12 bg-white/8 p-4">
+              <div className="neo-flat bg-white/8 p-4">
                 <p className="text-4xl font-bold text-[#5df591]">
                   {WASTE_ROUTE_STEPS.length}
                 </p>
                 <p className="mt-1 text-white/72">ขั้นตอนหลัก</p>
               </div>
-              <div className="border border-white/12 bg-white/8 p-4">
+              <div className="neo-flat bg-white/8 p-4">
                 <p className="text-4xl font-bold text-white">3</p>
                 <p className="mt-1 text-white/72">ปลายทางขยะ</p>
               </div>
@@ -687,10 +636,10 @@ function WasteRouteContent() {
           <div className="grid gap-3 md:grid-cols-2">
             {WASTE_ROUTE_STEPS.map((step, index) => (
               <article
-                className="grid grid-cols-[44px_minmax(0,1fr)] gap-4 border border-[#e1e1e1] bg-white p-5"
+                className="neo-card grid grid-cols-[44px_minmax(0,1fr)] gap-4 p-5"
                 key={step.title}
               >
-                <span className="flex size-11 items-center justify-center rounded-full bg-[#5df591] text-sm font-bold text-[#111111]">
+                <span className="rounded-base flex size-11 items-center justify-center bg-[#5df591] text-sm font-bold text-[#111111]">
                   {index + 1}
                 </span>
                 <div>
@@ -749,7 +698,7 @@ function WasteSearchWorkspace({
                 />
                 <Input
                   aria-label="ชื่อขยะ"
-                  className="h-14 rounded-full border-[#e1e1e1] bg-[#f7f8f3] pr-12 pl-11 text-base placeholder:text-[#6f7470] focus-visible:border-[#5df591] focus-visible:ring-[#5df591]/30"
+                  className="rounded-base h-14 border-[#e1e1e1] bg-[#f7f8f3] pr-12 pl-11 text-base placeholder:text-[#6f7470] focus-visible:border-[#5df591] focus-visible:ring-[#5df591]/30"
                   onChange={handleQueryChange}
                   placeholder="เช่น ถ่านไฟฉาย หรือ ขวดพลาสติก"
                   required
@@ -770,7 +719,7 @@ function WasteSearchWorkspace({
                 </Button>
               </div>
               <Button
-                className="h-14 rounded-full bg-[#111111] px-7 text-base font-bold text-white hover:bg-[#2a2a2a]"
+                className="rounded-base h-14 bg-[#111111] px-7 text-base font-bold text-white hover:bg-[#2a2a2a]"
                 type="submit"
               >
                 <IconSearch data-icon="inline-start" />
@@ -782,7 +731,7 @@ function WasteSearchWorkspace({
               <span>ลองค้นหา:</span>
               {EXAMPLES.map((example) => (
                 <button
-                  className="rounded-full border border-[#e1e1e1] bg-white px-4 py-1.5 font-semibold transition-colors hover:border-[#5df591] hover:bg-[#effff3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5df591]"
+                  className="neo-interactive bg-secondary-background px-4 py-1.5 font-semibold transition-colors hover:border-[#5df591] hover:bg-[#effff3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5df591]"
                   key={example}
                   onClick={() => searchExample(example)}
                   type="button"
@@ -795,7 +744,7 @@ function WasteSearchWorkspace({
 
           <div
             aria-hidden="true"
-            className="hidden min-h-[360px] items-center justify-center rounded-[32px] bg-[#f7f8f3] p-8 md:grid"
+            className="neo-surface hidden min-h-[360px] items-center justify-center bg-[#f7f8f3] p-8 md:grid"
           >
             <div className="grid grid-cols-4 items-end gap-4 lg:gap-5">
               {(['red', 'green', 'blue', 'yellow'] as const).map(
@@ -822,7 +771,7 @@ function WasteSearchWorkspace({
         ) : results.length > 0 ? (
           <SearchResults results={results} />
         ) : (
-          <div className="mx-auto max-w-xl border border-[#e1c7b4] bg-[#fff8f1] p-6 text-center">
+          <div className="neo-surface mx-auto max-w-xl bg-[#fff8f1] p-6 text-center">
             <p className="text-lg font-semibold">
               ยังไม่พบ “{searchedQuery}” ในรายการ
             </p>

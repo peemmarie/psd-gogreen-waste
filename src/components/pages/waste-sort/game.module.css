@@ -99,7 +99,7 @@
 .wastePosition {
   position: absolute;
   z-index: 5;
-  transition: top 100ms linear;
+  transition: top 60ms linear;
   will-change: top;
 }
 
@@ -397,11 +397,18 @@
   color: #d4622b;
 }
 
-.homeLink {
+.topActions {
   position: absolute;
   z-index: 35;
   top: 14px;
   left: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.homeLink,
+.restartButton {
   display: inline-flex;
   min-height: 42px;
   align-items: center;
@@ -415,7 +422,24 @@
   font-weight: 700;
 }
 
-.homeLink:focus-visible {
+.restartButton {
+  cursor: pointer;
+  color: #111111;
+  box-shadow: 0 4px 0 #168542;
+}
+
+.homeLink:hover,
+.restartButton:hover {
+  background: #eef7ea;
+}
+
+.restartButton:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #168542;
+}
+
+.homeLink:focus-visible,
+.restartButton:focus-visible {
   outline: 3px solid #5df591;
   outline-offset: 2px;
 }
@@ -779,7 +803,22 @@
 }
 
 @media (max-width: 640px) {
+  .topActions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .homeLink,
+  .restartButton {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+  .restartButton span {
+    display: none;
+  }
   .hud {
+    left: 106px;
     justify-content: flex-end;
   }
   .hudItem {
