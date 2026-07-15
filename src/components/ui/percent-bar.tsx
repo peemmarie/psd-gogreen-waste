@@ -31,9 +31,9 @@ export function PercentBar({
 
   return (
     <div className="space-y-1">
-      <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+      <div className="bg-muted rounded-base h-2 w-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          className={`rounded-base h-full transition-all duration-500 ${color}`}
           style={{ width: `${pct}%` }}
         />
       </div>
