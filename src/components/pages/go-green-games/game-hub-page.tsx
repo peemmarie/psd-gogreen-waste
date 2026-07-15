@@ -229,12 +229,12 @@ export function GameHubPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-[#f6faf3] text-[#173d2a]">
-      <header className="border-b border-[#d8e5d9] bg-white/90">
+    <main className="min-h-dvh bg-[#f7f8f3] text-[#111111]">
+      <header className="sticky top-0 z-50 border-b border-[#eceee7] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
           <div className="flex flex-wrap items-center gap-3">
             <Button
-              className="border-[#bad0bc] bg-white text-[#216c45] hover:bg-[#eef7ea]"
+              className="rounded-full border-[#e1e1e1] bg-white text-[#111111] hover:bg-[#f7f8f3]"
               nativeButton={false}
               render={<Link href="/" />}
             >
@@ -242,14 +242,14 @@ export function GameHubPage() {
               ย้อนกลับ
             </Button>
             <Link className="flex items-center gap-3 font-bold" href="/">
-              <span className="flex size-10 items-center justify-center rounded-full bg-[#dcefd5] text-[#2e7047]">
+              <span className="flex size-10 items-center justify-center rounded-full bg-[#111111] text-[#5df591]">
                 <IconLeaf aria-hidden="true" />
               </span>
               Go Green
             </Link>
           </div>
           <Button
-            className="bg-[#216c45] hover:bg-[#185437]"
+            className="rounded-full bg-[#5df591] font-bold text-[#111111] hover:bg-[#49db7b]"
             nativeButton={false}
             render={<Link href="/game/waste-sort" />}
           >
@@ -259,21 +259,10 @@ export function GameHubPage() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[320px_1fr]">
-        <aside className="flex flex-col gap-4">
-          <div className="border border-[#d8e5d9] bg-white p-5">
-            <p className="text-sm font-semibold text-[#2e7047]">
-              Learning Platform
-            </p>
-            <h1 className="mt-2 text-3xl leading-tight font-bold">
-              เรียน เล่น และลงมือทำ
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-[#557164]">
-              อ่านเนื้อหาแบบเข้าใจง่าย
-              แล้วฝึกผ่านเกมและภารกิจที่เชื่อมกับชีวิตจริง
-            </p>
-          </div>
+      <LearningHubHero />
 
+      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[340px_1fr]">
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           <LearningPath
             activeModuleId={activeModule.id}
             onSelectModule={selectModule}
@@ -768,6 +757,53 @@ function LearningCycle() {
           </li>
         ))}
       </ol>
+    </section>
+  )
+}
+
+function LearningHubHero() {
+  return (
+    <section className="border-b border-[#eceee7] bg-white">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-[#effff3] px-4 py-2 text-sm font-bold text-[#168542]">
+            <IconSparkles aria-hidden="true" className="size-4" />
+            Learning Platform
+          </p>
+          <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-bold tracking-[-0.03em] text-balance sm:text-7xl">
+            เรียน เล่น และลงมือทำ
+            <span className="block text-[#168542]">ในเส้นทางเดียว</span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#4d5053]">
+            เลือกบทเรียน อ่านสาระสำคัญ
+            แล้วฝึกผ่านเกมที่เชื่อมกับพฤติกรรมสีเขียวในชีวิตจริง
+          </p>
+        </div>
+
+        <div className="bg-[#111111] p-5 text-white">
+          <div className="rounded-[24px] bg-[#5df591] p-5 text-[#111111]">
+            <p className="text-sm font-bold">เส้นทางแนะนำ</p>
+            <h2 className="mt-3 text-3xl font-bold">Learn → Play → Act</h2>
+            <p className="mt-3 text-sm leading-6 text-[#173d2a]">
+              อ่านแนวคิด เล่นกิจกรรม แล้วนำกลับไปใช้กับพฤติกรรมจริงในอาคาร
+            </p>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="border border-white/12 bg-white/8 p-4">
+              <p className="text-4xl font-bold text-[#5df591]">6</p>
+              <p className="mt-1 text-sm font-semibold text-white/72">
+                บทเรียนสั้นพร้อมกิจกรรม
+              </p>
+            </div>
+            <div className="border border-white/12 bg-white/8 p-4">
+              <p className="text-4xl font-bold text-white">4</p>
+              <p className="mt-1 text-sm font-semibold text-white/72">
+                ขั้นตอนเรียนรู้จนลงมือทำ
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

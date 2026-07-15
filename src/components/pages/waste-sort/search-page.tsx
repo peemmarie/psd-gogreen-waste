@@ -4,20 +4,22 @@ import { type ChangeEvent, type FormEvent, useMemo, useState } from 'react'
 
 import {
   IconArrowRight,
+  IconBolt,
+  IconCloud,
+  IconDroplet,
+  IconGasStation,
   IconLeaf,
+  IconPrinter,
+  IconRecycle,
   IconSearch,
   IconSparkles,
+  IconTrash,
   IconX,
 } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { Button } from '~/components/ui/button'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '~/components/ui/input-group'
+import { Input } from '~/components/ui/input'
 import { cn } from '~/lib/utils'
 
 import {
@@ -31,11 +33,137 @@ import { WasteBin } from './waste-bin'
 
 const EXAMPLES = ['ถ่านไฟฉาย', 'ขวดน้ำพลาสติก', 'เศษอาหาร']
 const HERO_BIN_OFFSETS = [
+  'translate-y-2',
   '-translate-y-2',
-  'translate-y-0',
-  '-translate-y-2',
-  'translate-y-0',
+  'translate-y-2',
+  'translate-y-4',
 ]
+const HERO_PROOFS = [
+  { label: 'เป้าหมายปี 2569', value: '6' },
+  { label: 'ประเภทถังขยะหลัก', value: '4' },
+  { label: 'แนวทางทำได้ทันที', value: '12' },
+]
+const ENVIRONMENT_TARGETS = [
+  {
+    icon: IconBolt,
+    iconClass: 'bg-[#fff3a8] text-[#8a6100]',
+    metric: 'การใช้ไฟฟ้า',
+    reduction: 'ลดลงร้อยละ 3',
+    unit: 'kW-h',
+  },
+  {
+    icon: IconGasStation,
+    iconClass: 'bg-[#ffe5d8] text-[#a1461c]',
+    metric: 'การใช้น้ำมันเชื้อเพลิง',
+    reduction: 'ลดลงร้อยละ 3',
+    unit: 'ลิตร',
+  },
+  {
+    icon: IconDroplet,
+    iconClass: 'bg-[#d8f0fa] text-[#2478a8]',
+    metric: 'การใช้น้ำ',
+    reduction: 'ลดลงร้อยละ 3',
+    unit: 'ลูกบาศก์เมตร',
+  },
+  {
+    icon: IconPrinter,
+    iconClass: 'bg-[#ecefce] text-[#59631d]',
+    metric: 'การใช้กระดาษ',
+    reduction: 'ลดลงร้อยละ 3',
+    unit: 'รีม',
+  },
+  {
+    icon: IconTrash,
+    iconClass: 'bg-[#dcefd5] text-[#216c45]',
+    metric: 'ปริมาณขยะทั่วไป',
+    reduction: 'ลดลงร้อยละ 6',
+    unit: 'กิโลกรัม',
+  },
+  {
+    icon: IconCloud,
+    iconClass: 'bg-[#e3e9ef] text-[#53616c]',
+    metric: 'ปริมาณก๊าซเรือนกระจก',
+    reduction: 'ลดลงร้อยละ 3',
+    unit: 'KgCO₂e',
+  },
+]
+const GO_STANDARD_CATEGORIES = [
+  'หมวดที่ 1 การบริหารจัดการองค์กรสีเขียว',
+  'หมวดที่ 2 การจัดการพลังงานและสิ่งแวดล้อม',
+  'หมวดที่ 3 การจัดซื้อจัดจ้างที่เป็นมิตรกับสิ่งแวดล้อม',
+  'หมวดที่ 4 สภาพแวดล้อมและความปลอดภัยในการทำงาน',
+]
+const RESOURCE_PRACTICE_SECTIONS = [
+  {
+    action: 'ปิดไฟ / พักหน้าจอ / ใช้บันได',
+    cardClass: 'border-[#eadb96] bg-[#fffbeb]',
+    description: 'ลดพลังงานจากจุดใช้งานประจำวันในอาคาร',
+    icon: IconBolt,
+    iconClass: 'bg-[#fff3a8] text-[#8a6100]',
+    title: 'การใช้ไฟฟ้า',
+  },
+  {
+    action: 'ปิดน้ำ / แจ้งรั่ว / ใช้อย่างพอดี',
+    cardClass: 'border-[#b7d3df] bg-[#edf7fb]',
+    description: 'ใช้น้ำเท่าที่จำเป็นและรีบแก้ไขเมื่อพบการรั่วไหล',
+    icon: IconDroplet,
+    iconClass: 'bg-[#d8f0fa] text-[#2478a8]',
+    title: 'การใช้น้ำ',
+  },
+  {
+    action: 'ตรวจก่อนพิมพ์ / ใช้สองหน้า / ส่งไฟล์',
+    cardClass: 'border-[#d7d9c3] bg-[#fbfbf0]',
+    description: 'ลดเอกสารกระดาษและใช้เครื่องถ่ายเอกสารอย่างคุ้มค่า',
+    icon: IconPrinter,
+    iconClass: 'bg-[#ecefce] text-[#59631d]',
+    title: 'การใช้กระดาษและเครื่องถ่ายเอกสาร',
+  },
+  {
+    action: 'ลดพลาสติก / แยกสีถัง / แยกรีไซเคิล',
+    cardClass: 'border-[#bfdec6] bg-[#eff8f1]',
+    description: 'ลดขยะตั้งแต่ต้นทางและแยกประเภทก่อนนำไปทิ้ง',
+    icon: IconRecycle,
+    iconClass: 'bg-[#dcefd5] text-[#216c45]',
+    title: 'การแยกขยะ',
+  },
+]
+const WASTE_ROUTE_STEPS = [
+  {
+    detail: 'ขยะจากอาคารของ ฝกส. เริ่มชั่งน้ำหนักและจดบันทึกเดือน ก.ค. 68',
+    title: 'รวบรวมขยะจากอาคาร',
+  },
+  {
+    detail: 'แม่บ้านชั่งน้ำหนักและบันทึกสถิติรายวัน',
+    title: 'ชั่งน้ำหนักและบันทึกข้อมูล',
+  },
+  {
+    detail: 'ขยะรีไซเคิลสามารถจำหน่ายเป็นรายได้หลังแยกประเภทถูกต้อง',
+    title: 'ขยะรีไซเคิล',
+  },
+  {
+    detail: 'ขยะทั่วไปจัดเก็บโดย กทม. และขยะเศษอาหารนำไปรวมกับขยะทั่วไป',
+    title: 'ขยะทั่วไปและเศษอาหาร',
+  },
+  {
+    detail: 'ฝกส. นำส่งโรงกำจัดขยะพิษของ กทม. เพื่อกำจัดอย่างถูกวิธี',
+    title: 'ขยะมีพิษ',
+  },
+  {
+    detail: 'ฝกพ. ประสาน บ.กรุงเทพธนาคม เพื่อจัดเก็บขยะติดเชื้อ',
+    title: 'ขยะติดเชื้อ',
+  },
+]
+
+type WasteSearchWorkspaceProps = {
+  handleQueryChange: (event: ChangeEvent<HTMLInputElement>) => void
+  handleSearch: (event: FormEvent<HTMLFormElement>) => void
+  hasSearchState: boolean
+  query: string
+  resetSearch: () => void
+  results: WasteItem[]
+  searchedQuery: string
+  searchExample: (example: string) => void
+}
 
 export function WasteSortSearchPage() {
   const [query, setQuery] = useState('')
@@ -79,142 +207,54 @@ export function WasteSortSearchPage() {
   }
 
   return (
-    <main className="min-h-dvh overflow-hidden bg-[#f6faf3] text-[#173d2a]">
-      <header className="border-b border-[#d8e5d9] bg-white/90">
+    <main className="min-h-dvh overflow-hidden bg-[#f7f8f3] text-[#111111]">
+      <header className="sticky top-0 z-50 border-b border-[#eceee7] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-          <Link className="flex items-center gap-3 font-bold" href="/">
-            <span className="flex size-10 items-center justify-center rounded-full bg-[#dcefd5] text-[#2e7047]">
+          <Link className="flex items-center gap-3 text-lg font-bold" href="/">
+            <span className="flex size-10 items-center justify-center rounded-full bg-[#111111] text-[#5df591]">
               <IconLeaf aria-hidden="true" />
             </span>
             <span>Go Green</span>
           </Link>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <Button
-              className="border-[#bad0bc] bg-white text-[#216c45] hover:bg-[#eef7ea]"
-              nativeButton={false}
-              render={<Link href="/game" />}
-            >
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#4d5053] md:flex">
+            <Link className="hover:text-[#111111]" href="#learning">
+              เรียนรู้
+            </Link>
+            <Link className="hover:text-[#111111]" href="#search">
+              ค้นหาถัง
+            </Link>
+            <Link className="hover:text-[#111111]" href="#waste-route">
+              เส้นทางขยะ
+            </Link>
+            <Link className="hover:text-[#111111]" href="/game">
               เกมทั้งหมด
-            </Button>
+            </Link>
+          </nav>
+          <div className="flex items-center justify-end gap-2">
             <Button
-              className="bg-[#216c45] hover:bg-[#185437]"
+              className="rounded-full bg-[#5df591] px-5 font-bold text-[#111111] hover:bg-[#49db7b]"
               nativeButton={false}
               render={<Link href="/game/waste-sort" />}
             >
-              เล่นเกมแยกขยะ
+              เริ่มเล่น
               <IconArrowRight data-icon="inline-end" />
             </Button>
           </div>
         </div>
       </header>
 
-      <section className="relative border-b border-[#d8e5d9] bg-[#e8f2df]">
-        <div className="absolute inset-x-0 bottom-0 h-2 bg-[linear-gradient(90deg,#d94b45_0_25%,#439b61_25%_50%,#2478a8_50%_75%,#f4bd2a_75%)]" />
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.15fr_0.85fr] md:py-20">
-          <div>
-            <p className="mb-4 flex items-center gap-2 text-sm font-semibold text-[#2e7047]">
-              <IconSparkles aria-hidden="true" className="size-5" />
-              คู่มือคัดแยกขยะ ฝวฟ.
-            </p>
-            <h1 className="max-w-2xl text-4xl leading-tight font-bold sm:text-5xl">
-              ชิ้นนี้ต้องลง
-              <span className="block text-[#d4622b]">ถังสีอะไร?</span>
-            </h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-[#557164]">
-              ค้นหาชื่อขยะ แล้วดูประเภทและสีถังที่ถูกต้องก่อนทิ้ง
-            </p>
-
-            <form
-              className="mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
-              onSubmit={handleSearch}
-            >
-              <InputGroup className="h-12 border-[#a9c6ad] bg-white shadow-sm focus-within:border-[#216c45] focus-within:ring-[#216c45]/20 sm:w-[30rem]">
-                <InputGroupAddon>
-                  <IconSearch aria-hidden="true" />
-                </InputGroupAddon>
-                <InputGroupInput
-                  aria-label="ชื่อขยะ"
-                  className="px-2 text-base md:text-base"
-                  onChange={handleQueryChange}
-                  placeholder="เช่น ถ่านไฟฉาย หรือ ขวดพลาสติก"
-                  required
-                  value={query}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    aria-hidden={!hasSearchState}
-                    aria-label="ล้างคำค้นหา"
-                    className={cn(!hasSearchState && 'invisible')}
-                    disabled={!hasSearchState}
-                    onClick={resetSearch}
-                    size="icon-sm"
-                    type="button"
-                  >
-                    <IconX aria-hidden="true" />
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-              <Button
-                className="h-12 bg-[#d4622b] px-6 text-base hover:bg-[#b84c1f]"
-                type="submit"
-              >
-                <IconSearch data-icon="inline-start" />
-                ค้นหา
-              </Button>
-            </form>
-
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-[#557164]">
-              <span>ลองค้นหา:</span>
-              {EXAMPLES.map((example) => (
-                <button
-                  className="rounded-full border border-[#bad0bc] bg-white px-3 py-1.5 transition-colors hover:border-[#216c45] hover:text-[#216c45] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#216c45]"
-                  key={example}
-                  onClick={() => searchExample(example)}
-                  type="button"
-                >
-                  {example}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div
-            aria-hidden="true"
-            className="hidden grid-cols-4 items-end gap-3 md:grid"
-          >
-            {(['red', 'green', 'blue', 'yellow'] as const).map(
-              (color, index) => (
-                <WasteBin
-                  className={HERO_BIN_OFFSETS[index]}
-                  color={color}
-                  compact
-                  key={color}
-                />
-              )
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section
-        aria-live="polite"
-        className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14"
-      >
-        {!searchedQuery ? (
-          <BinGuide />
-        ) : results.length > 0 ? (
-          <SearchResults results={results} />
-        ) : (
-          <div className="border border-[#e1c7b4] bg-[#fff8f1] p-6 text-center">
-            <p className="text-lg font-semibold">
-              ยังไม่พบ “{searchedQuery}” ในรายการ
-            </p>
-            <p className="mt-2 text-[#6d766f]">
-              ลองใช้คำสั้นลง เช่น “ขวด” “กระดาษ” หรือ “ถ่าน”
-            </p>
-          </div>
-        )}
-      </section>
+      <LearningContent />
+      <WasteSearchWorkspace
+        handleQueryChange={handleQueryChange}
+        handleSearch={handleSearch}
+        hasSearchState={hasSearchState}
+        query={query}
+        resetSearch={resetSearch}
+        results={results}
+        searchedQuery={searchedQuery}
+        searchExample={searchExample}
+      />
+      <WasteRouteContent />
     </main>
   )
 }
@@ -222,26 +262,28 @@ export function WasteSortSearchPage() {
 function BinGuide() {
   return (
     <div>
-      <div className="mb-7 flex items-end justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-[#2e7047]">จำสีให้แม่น</p>
-          <h2 className="mt-1 text-2xl font-bold">ถังขยะ 4 ประเภท</h2>
+          <h2 className="mt-1 text-2xl font-bold sm:text-3xl">
+            ถังขยะ 4 ประเภท
+          </h2>
         </div>
-        <p className="hidden max-w-sm text-right text-sm text-[#6d766f] sm:block">
+        <p className="max-w-sm text-sm leading-6 text-[#5b7265] sm:text-right">
           สีช่วยให้เราแยกปลายทางของขยะได้ถูกต้องตั้งแต่ต้นทาง
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {(['red', 'green', 'blue', 'yellow'] as const).map((color) => (
           <div
-            className="border border-[#d8e5d9] bg-white px-4 py-7"
+            className="border border-[#d8e5d9] bg-white px-4 py-6 transition-colors hover:border-[#a9c6ad]"
             key={color}
           >
             <WasteBin color={color} compact />
           </div>
         ))}
       </div>
-      <div className="mt-8 border border-[#d8e5d9] bg-white p-5">
+      <div className="mt-8 border border-[#d8e5d9] bg-white p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-[#2e7047]">
@@ -284,12 +326,177 @@ function BinGuide() {
   )
 }
 
+function LearningContent() {
+  return (
+    <section className="border-b border-[#eceee7] bg-[#f7f8f3]" id="learning">
+      <OrganizationOverview />
+
+      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-5 sm:px-8 sm:py-6">
+        <ResourcePracticeSection />
+        <StandardsAndTargetsSection />
+      </div>
+    </section>
+  )
+}
+
+function OrganizationOverview() {
+  return (
+    <section className="bg-white text-[#111111]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:min-h-[640px] lg:grid-cols-[0.96fr_1.04fr] lg:items-center">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-[#effff3] px-4 py-2 text-sm font-bold text-[#168542]">
+            <IconLeaf aria-hidden="true" className="size-4" />
+            MEA Green Organization
+          </p>
+          <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-bold tracking-[-0.03em] text-balance sm:text-7xl">
+            Learn, sort,
+            <span className="block">and go green.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-[#4d5053]">
+            บริหารพลังงาน ทรัพยากร และของเสียอย่างเป็นระบบ
+            เพื่อให้อาคารทำงานเป็นมิตรกับสิ่งแวดล้อมมากขึ้น
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button
+              className="h-12 rounded-full bg-[#5df591] px-7 text-base font-bold text-[#111111] hover:bg-[#49db7b]"
+              nativeButton={false}
+              render={<Link href="#search" />}
+            >
+              ค้นหาถังขยะ
+              <IconArrowRight data-icon="inline-end" />
+            </Button>
+            <Button
+              className="h-12 rounded-full bg-[#111111] px-7 text-base font-bold text-white hover:bg-[#2a2a2a]"
+              nativeButton={false}
+              render={<Link href="/game" />}
+            >
+              ไปที่ Learning Platform
+            </Button>
+          </div>
+        </div>
+
+        <div className="relative min-h-[420px] overflow-hidden rounded-[32px] bg-[#111111] p-5 text-white sm:p-7">
+          <div className="absolute top-5 right-5 rounded-full bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
+            Green score
+          </div>
+          <div className="grid h-full content-end gap-4">
+            <div className="rounded-[28px] bg-[#5df591] p-5 text-[#111111]">
+              <p className="text-sm font-bold">Mission วันนี้</p>
+              <h3 className="mt-3 text-3xl leading-tight font-bold">
+                แยกขยะให้ถูกถัง
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-[#173d2a]">
+                ค้นหา เรียนรู้ แล้วเล่นเกมฝึกแยกขยะในเส้นทางเดียว
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-[24px] bg-white p-4 text-[#111111]">
+                <p className="text-4xl font-bold">4</p>
+                <p className="mt-1 text-sm font-semibold text-[#4d5053]">
+                  ถังขยะหลัก
+                </p>
+              </div>
+              <div className="rounded-[24px] bg-[#f4f4ef] p-4 text-[#111111]">
+                <p className="text-4xl font-bold">6</p>
+                <p className="mt-1 text-sm font-semibold text-[#4d5053]">
+                  เป้าหมายสีเขียว
+                </p>
+              </div>
+            </div>
+            <blockquote className="rounded-[24px] border border-white/10 bg-white/8 p-4 text-base leading-7 font-semibold text-white">
+              “องค์กรด้านพลังงานที่เป็นมิตรกับสิ่งแวดล้อมอย่างยั่งยืน”
+            </blockquote>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-y border-[#eceee7] bg-[#f7f8f3]">
+        <div className="mx-auto grid max-w-6xl gap-0 px-5 py-6 sm:grid-cols-3 sm:px-8">
+          {HERO_PROOFS.map((proof) => (
+            <div
+              className="border-b border-[#e1e1e1] py-4 last:border-b-0 sm:border-r sm:border-b-0 sm:px-8 sm:first:pl-0 sm:last:border-r-0"
+              key={proof.label}
+            >
+              <p className="text-5xl leading-none font-bold tracking-[-0.04em]">
+                {proof.value}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-[#4d5053]">
+                {proof.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ResourcePracticeSection() {
+  return (
+    <section className="bg-[#f7f8f3] py-12 sm:py-16">
+      <div className="mb-8 grid gap-4 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
+        <h2 className="max-w-xl text-4xl leading-tight font-bold tracking-[-0.03em] text-balance sm:text-5xl">
+          Why Go Green?
+        </h2>
+        <p className="max-w-2xl text-lg leading-8 text-[#4d5053]">
+          เพราะพฤติกรรมเล็ก ๆ ในอาคารทำให้เป้าหมายพลังงาน น้ำ กระดาษ
+          และขยะขยับได้จริง
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {RESOURCE_PRACTICE_SECTIONS.map((section) => {
+          const SectionIcon = section.icon
+
+          return (
+            <article
+              className="grid min-h-56 grid-rows-[auto_1fr_auto] border border-[#e1e1e1] bg-white p-5"
+              key={section.title}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-xl font-bold text-[#111111]">
+                    {section.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-[#4d5053]">
+                    {section.description}
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    'flex size-12 shrink-0 items-center justify-center rounded-full',
+                    section.iconClass
+                  )}
+                >
+                  <SectionIcon aria-hidden="true" className="size-7" />
+                </span>
+              </div>
+              <div className="mt-5 h-px bg-[#e1e1e1]" />
+              <p className="mt-4 text-base font-bold text-[#111111]">
+                {section.action}
+              </p>
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
 function SearchResults({ results }: { results: WasteItem[] }) {
   return (
     <div>
-      <p className="mb-5 text-sm font-semibold text-[#557164]">
-        พบ {results.length} รายการ
-      </p>
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#2e7047]">ผลการค้นหา</p>
+          <h2 className="mt-1 text-2xl font-bold">
+            พบ {results.length} รายการ
+          </h2>
+        </div>
+        <p className="max-w-md text-sm leading-6 text-[#5b7265] sm:text-right">
+          ตรวจประเภทและสีถัง พร้อมเหตุผลสั้น ๆ ก่อนนำไปทิ้ง
+        </p>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         {results.map((item) => {
           const bin = BIN_DETAILS[item.bin]
@@ -298,7 +505,7 @@ function SearchResults({ results }: { results: WasteItem[] }) {
           )
           return (
             <article
-              className="grid grid-cols-[1fr_112px] items-center gap-5 border border-[#d8e5d9] bg-white p-6 shadow-[0_10px_30px_rgba(42,83,55,0.07)]"
+              className="grid gap-5 border border-[#d8e5d9] bg-white p-5 md:grid-cols-[minmax(0,1fr)_112px] md:items-center"
               key={item.name}
             >
               <div>
@@ -306,11 +513,11 @@ function SearchResults({ results }: { results: WasteItem[] }) {
                   {item.emoji}
                 </span>
                 <h2 className="mt-3 text-xl font-bold">{item.name}</h2>
-                <p className="mt-2 text-[#557164]">ประเภท: {item.type}</p>
+                <p className="mt-2 text-[#5b7265]">ประเภท: {item.type}</p>
                 <p className="mt-4 font-semibold text-[#216c45]">
                   ทิ้งลงถัง{bin.colorName}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-[#557164]">
+                <p className="mt-2 text-sm leading-6 text-[#5b7265]">
                   {getWasteSortingTip(item)}
                 </p>
                 {relatedModule ? (
@@ -323,11 +530,308 @@ function SearchResults({ results }: { results: WasteItem[] }) {
                   </Link>
                 ) : null}
               </div>
-              <WasteBin color={item.bin} compact />
+              <div className="justify-self-start md:justify-self-end">
+                <WasteBin color={item.bin} compact />
+              </div>
             </article>
           )
         })}
       </div>
     </div>
+  )
+}
+
+function StandardsAndTargetsSection() {
+  return (
+    <section className="overflow-hidden bg-[#111111] text-white">
+      <div className="p-5 sm:p-8">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
+              <IconLeaf aria-hidden="true" className="size-4" />
+              เป้าหมายปี 2569
+            </p>
+            <h2 className="mt-4 max-w-3xl text-3xl leading-tight font-bold text-balance sm:text-5xl">
+              ลดการใช้ทรัพยากร
+              <span className="block text-[#5df591]">จากปีฐาน 2568</span>
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/72">
+              ตั้งเป้าลดพลังงาน น้ำ กระดาษ ขยะ และก๊าซเรือนกระจก
+              ให้เห็นผลเป็นตัวเลขเดียวกันทั้งหน่วยงาน
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="border border-white/12 bg-white/8 p-4">
+              <p className="text-5xl leading-none font-bold text-[#5df591]">
+                6
+              </p>
+              <p className="mt-2 text-sm font-semibold text-white/72">
+                เป้าหมายที่ต้องติดตาม
+              </p>
+            </div>
+            <div className="border border-white/12 bg-white/8 p-4">
+              <p className="text-5xl leading-none font-bold text-white">2568</p>
+              <p className="mt-2 text-sm font-semibold text-white/72">
+                ปีฐานสำหรับเปรียบเทียบ
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-[#f7f8f3] p-4 text-[#111111] sm:p-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {ENVIRONMENT_TARGETS.map((target) => {
+            const TargetIcon = target.icon
+
+            return (
+              <div
+                className="border border-[#e1e1e1] bg-white p-4"
+                key={target.metric}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-base leading-6 font-bold text-[#111111]">
+                      {target.metric}
+                    </p>
+                    <p className="mt-2 text-2xl leading-none font-bold text-[#168542]">
+                      {target.reduction}
+                    </p>
+                  </div>
+                  <span
+                    className={cn(
+                      'flex size-14 shrink-0 items-center justify-center',
+                      target.iconClass
+                    )}
+                  >
+                    <TargetIcon aria-hidden="true" className="size-8" />
+                  </span>
+                </div>
+                <p className="mt-4 border-t border-[#e1e1e1] pt-3 text-sm text-[#4d5053]">
+                  หน่วยอ้างอิง: {target.unit}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="mt-5 grid gap-3 border border-[#e1e1e1] bg-white p-4 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div>
+            <p className="text-sm font-bold text-[#168542]">
+              มาตรฐานองค์กรสีเขียว
+            </p>
+            <h3 className="mt-1 text-2xl font-bold text-[#111111]">
+              MEA GO Standard
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-[#4d5053]">
+              โครงมาตรฐานที่ช่วยให้การทำงานสีเขียวเป็นระบบเดียวกัน
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {GO_STANDARD_CATEGORIES.map((category, index) => (
+              <div
+                className="flex items-start gap-3 border border-[#e1e1e1] bg-[#f7f8f3] p-3"
+                key={category}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#5df591] text-sm font-bold text-[#111111]">
+                  {index + 1}
+                </span>
+                <p className="text-sm leading-6 font-semibold">{category}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function WasteRouteContent() {
+  return (
+    <section
+      className="border-b border-[#eceee7] bg-[#f7f8f3]"
+      id="waste-route"
+    >
+      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
+        <div className="grid gap-6 lg:grid-cols-[0.74fr_1.26fr]">
+          <div className="flex flex-col justify-between gap-8 bg-[#111111] p-6 text-white">
+            <div>
+              <p className="inline-flex items-center gap-2 rounded-full bg-[#5df591] px-4 py-2 text-sm font-bold text-[#111111]">
+                <IconRecycle aria-hidden="true" className="size-4" />
+                เส้นทางการจัดการขยะ
+              </p>
+              <h2 className="mt-5 text-4xl leading-tight font-bold tracking-[-0.03em] text-balance sm:text-5xl">
+                จากการรวบรวมในอาคาร สู่ปลายทางที่เหมาะสม
+              </h2>
+              <p className="mt-5 text-base leading-7 text-white/72">
+                แยกขั้นตอนการจัดการขยะของหน่วยงานให้เห็นภาพชัดเจน
+                ตั้งแต่การชั่งน้ำหนัก บันทึกข้อมูล ไปจนถึงการส่งกำจัด
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="border border-white/12 bg-white/8 p-4">
+                <p className="text-4xl font-bold text-[#5df591]">
+                  {WASTE_ROUTE_STEPS.length}
+                </p>
+                <p className="mt-1 text-white/72">ขั้นตอนหลัก</p>
+              </div>
+              <div className="border border-white/12 bg-white/8 p-4">
+                <p className="text-4xl font-bold text-white">3</p>
+                <p className="mt-1 text-white/72">ปลายทางขยะ</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {WASTE_ROUTE_STEPS.map((step, index) => (
+              <article
+                className="grid grid-cols-[44px_minmax(0,1fr)] gap-4 border border-[#e1e1e1] bg-white p-5"
+                key={step.title}
+              >
+                <span className="flex size-11 items-center justify-center rounded-full bg-[#5df591] text-sm font-bold text-[#111111]">
+                  {index + 1}
+                </span>
+                <div>
+                  <h3 className="font-bold text-[#111111]">{step.title}</h3>
+                  <p className="mt-1.5 text-sm leading-6 text-[#4d5053]">
+                    {step.detail}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function WasteSearchWorkspace({
+  handleQueryChange,
+  handleSearch,
+  hasSearchState,
+  query,
+  resetSearch,
+  results,
+  searchedQuery,
+  searchExample,
+}: WasteSearchWorkspaceProps) {
+  return (
+    <>
+      <section
+        className="relative border-b border-[#eceee7] bg-white"
+        id="search"
+      >
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
+          <div>
+            <p className="mb-3 flex items-center gap-2 text-sm font-bold text-[#168542] sm:text-base">
+              <IconSparkles aria-hidden="true" className="size-5" />
+              คู่มือคัดแยกขยะ ฝวฟ.
+            </p>
+            <h2 className="max-w-2xl text-5xl leading-[1.02] font-bold tracking-[-0.03em] text-balance text-[#111111] sm:text-6xl">
+              ชิ้นนี้ต้องลง
+              <span className="block text-[#168542]">ถังสีอะไร?</span>
+            </h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[#4d5053] sm:text-lg sm:leading-8">
+              ค้นหาชื่อขยะ แล้วดูประเภทและสีถังที่ถูกต้องก่อนทิ้ง
+            </p>
+
+            <form
+              className="mt-8 flex max-w-3xl flex-col gap-3 sm:flex-row"
+              onSubmit={handleSearch}
+            >
+              <div className="relative sm:w-[32rem]">
+                <IconSearch
+                  aria-hidden="true"
+                  className="absolute top-1/2 left-4 size-5 -translate-y-1/2 text-[#78867b]"
+                />
+                <Input
+                  aria-label="ชื่อขยะ"
+                  className="h-14 rounded-full border-[#e1e1e1] bg-[#f7f8f3] pr-12 pl-11 text-base placeholder:text-[#6f7470] focus-visible:border-[#5df591] focus-visible:ring-[#5df591]/30"
+                  onChange={handleQueryChange}
+                  placeholder="เช่น ถ่านไฟฉาย หรือ ขวดพลาสติก"
+                  required
+                  value={query}
+                />
+                <Button
+                  aria-hidden={!hasSearchState}
+                  aria-label="ล้างคำค้นหา"
+                  className="absolute top-1/2 right-2 size-8 -translate-y-1/2 text-[#557164] hover:bg-[#eef7ea] hover:text-[#216c45] data-[hidden=true]:invisible"
+                  data-hidden={!hasSearchState}
+                  disabled={!hasSearchState}
+                  onClick={resetSearch}
+                  size="icon-sm"
+                  type="button"
+                  variant="ghost"
+                >
+                  <IconX aria-hidden="true" />
+                </Button>
+              </div>
+              <Button
+                className="h-14 rounded-full bg-[#111111] px-7 text-base font-bold text-white hover:bg-[#2a2a2a]"
+                type="submit"
+              >
+                <IconSearch data-icon="inline-start" />
+                ค้นหา
+              </Button>
+            </form>
+
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-[#4d5053] sm:text-base">
+              <span>ลองค้นหา:</span>
+              {EXAMPLES.map((example) => (
+                <button
+                  className="rounded-full border border-[#e1e1e1] bg-white px-4 py-1.5 font-semibold transition-colors hover:border-[#5df591] hover:bg-[#effff3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5df591]"
+                  key={example}
+                  onClick={() => searchExample(example)}
+                  type="button"
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div
+            aria-hidden="true"
+            className="hidden min-h-[360px] items-center justify-center rounded-[32px] bg-[#f7f8f3] p-8 md:grid"
+          >
+            <div className="grid grid-cols-4 items-end gap-4 lg:gap-5">
+              {(['red', 'green', 'blue', 'yellow'] as const).map(
+                (color, index) => (
+                  <WasteBin
+                    className={HERO_BIN_OFFSETS[index]}
+                    color={color}
+                    compact
+                    key={color}
+                  />
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        aria-live="polite"
+        className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14"
+      >
+        {!searchedQuery ? (
+          <BinGuide />
+        ) : results.length > 0 ? (
+          <SearchResults results={results} />
+        ) : (
+          <div className="mx-auto max-w-xl border border-[#e1c7b4] bg-[#fff8f1] p-6 text-center">
+            <p className="text-lg font-semibold">
+              ยังไม่พบ “{searchedQuery}” ในรายการ
+            </p>
+            <p className="mt-2 text-[#6d766f]">
+              ลองใช้คำสั้นลง เช่น “ขวด” “กระดาษ” หรือ “ถ่าน”
+            </p>
+          </div>
+        )}
+      </section>
+    </>
   )
 }
