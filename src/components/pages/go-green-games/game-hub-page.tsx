@@ -10,14 +10,18 @@ import {
   IconBuildingCommunity,
   IconCheck,
   IconCoin,
+  IconHeart,
   IconLeaf,
+  IconLock,
   IconPlayerPlay,
   IconRecycle,
   IconRefresh,
   IconShieldCheck,
   IconShoppingCart,
   IconSparkles,
+  IconTargetArrow,
   IconTrophy,
+  IconX,
 } from '@tabler/icons-react'
 import Link from 'next/link'
 
@@ -55,8 +59,8 @@ const MEA_GO_GAMES: {
   {
     accent: '#facc00',
     category: 'การจัดการพลังงานและสิ่งแวดล้อม',
-    genre: 'Find & Click',
-    howToPlay: 'ค้นหาและคลิกจุดที่สิ้นเปลืองพลังงานภายในเวลาที่กำหนด',
+    genre: 'Rapid Decision',
+    howToPlay: 'ตัดสินใจทีละสถานการณ์ว่าควรหยุดพลังงานหรือใช้งานต่อ',
     icon: IconBolt,
     id: 'energy-hunter',
     learning: 'การประหยัดพลังงานและลดการปล่อยคาร์บอน',
@@ -75,8 +79,8 @@ const MEA_GO_GAMES: {
   {
     accent: '#ff9f6e',
     category: 'สภาพแวดล้อมและความปลอดภัยในการทำงาน',
-    genre: 'Spot the Hazard',
-    howToPlay: 'ค้นหาและคลิกจุดเสี่ยงหรือสิ่งผิดปกติในสำนักงาน',
+    genre: 'Memory Match',
+    howToPlay: 'จับคู่จุดเสี่ยงกับวิธีแก้ไขโดยใช้จำนวนครั้งให้น้อยที่สุด',
     icon: IconShieldCheck,
     id: 'safety-inspector',
     learning: 'ความปลอดภัยในการทำงานและการจัดสภาพแวดล้อมที่เหมาะสม',
@@ -222,7 +226,7 @@ const ENERGY_HOTSPOTS = [
   },
 ]
 
-const SAFETY_HAZARDS = [
+const _SAFETY_HAZARDS = [
   {
     id: 'cable',
     label: 'สายไฟพาดทางเดิน',
@@ -270,9 +274,9 @@ const SAFETY_HAZARDS = [
   },
 ]
 
-const SHOPPING_BUDGET = 1200
+const SHOPPING_BUDGET = 900
 
-const SHOPPING_ITEMS = [
+const _SHOPPING_ITEMS = [
   {
     category: 'แสงสว่าง',
     ecoScore: 24,
@@ -339,6 +343,181 @@ const SHOPPING_ITEMS = [
   },
 ]
 
+const ENERGY_TILES = [
+  ...ENERGY_HOTSPOTS.map((item) => ({ ...item, isWaste: true })),
+  {
+    id: 'daylight',
+    isWaste: false,
+    label: 'พื้นที่ริมหน้าต่าง',
+    signal: 'ใช้แสงธรรมชาติและปิดไฟแถวริมหน้าต่างแล้ว',
+    tip: 'ทำได้ดีแล้ว ใช้แสงธรรมชาติช่วยลดการใช้ไฟ',
+    zone: 'โซนทำงาน B',
+  },
+  {
+    id: 'eco-mode',
+    isWaste: false,
+    label: 'เครื่องถ่ายเอกสาร',
+    signal: 'เปิดโหมดประหยัดพลังงานและพิมพ์สองหน้าอัตโนมัติ',
+    tip: 'การตั้งค่านี้เหมาะสมแล้ว ไม่ต้องแก้ไข',
+    zone: 'ห้องเอกสาร',
+  },
+  {
+    id: 'meeting',
+    isWaste: false,
+    label: 'จอห้องอบรม',
+    signal: 'กำลังนำเสนอให้ผู้เข้าร่วม 24 คน',
+    tip: 'อุปกรณ์กำลังถูกใช้งานตามความจำเป็น',
+    zone: 'ห้องอบรม',
+  },
+  {
+    id: 'server',
+    isWaste: false,
+    label: 'ระบบเซิร์ฟเวอร์',
+    signal: 'ทำงานตามแผนระบบและมีการวัดโหลดแบบเรียลไทม์',
+    tip: 'เป็นโหลดที่จำเป็นและมีระบบติดตามแล้ว',
+    zone: 'ห้องระบบ',
+  },
+  {
+    id: 'sensor',
+    isWaste: false,
+    label: 'ไฟทางเดิน',
+    signal: 'เซนเซอร์เปิดไฟเฉพาะเมื่อมีคนเดินผ่าน',
+    tip: 'ระบบควบคุมตามการใช้งานช่วยลดพลังงานได้ดี',
+    zone: 'ทางเดินกลาง',
+  },
+]
+
+const ENERGY_GAME_SITUATIONS = [
+  ENERGY_TILES[0],
+  ENERGY_TILES[5],
+  ENERGY_TILES[1],
+  ENERGY_TILES[7],
+  ENERGY_TILES[2],
+  ENERGY_TILES[6],
+  ENERGY_TILES[3],
+  ENERGY_TILES[9],
+  ENERGY_TILES[4],
+  ENERGY_TILES[8],
+] as (typeof ENERGY_TILES)[number][]
+
+const SHOPPING_ROUNDS = [
+  {
+    category: 'แสงสว่าง',
+    mission: 'เปลี่ยนหลอดไฟในพื้นที่ส่วนกลาง',
+    options: [
+      {
+        ecoScore: 25,
+        id: 'led',
+        label: 'หลอด LED ฉลากประหยัดไฟ',
+        price: 260,
+        reason: 'ใช้ไฟน้อย อายุใช้งานยาว และมีฉลากรับรอง',
+      },
+      {
+        ecoScore: 7,
+        id: 'cheap-bulb',
+        label: 'หลอดราคาประหยัด ไม่ระบุประสิทธิภาพ',
+        price: 120,
+        reason: 'ราคาต่ำกว่า แต่ไม่มีข้อมูลประสิทธิภาพและอายุใช้งาน',
+      },
+    ],
+  },
+  {
+    category: 'เอกสาร',
+    mission: 'จัดซื้อกระดาษสำหรับงานประจำเดือน',
+    options: [
+      {
+        ecoScore: 25,
+        id: 'recycled-paper',
+        label: 'กระดาษรีไซเคิล 80 gsm',
+        price: 210,
+        reason: 'ลดการใช้เยื่อใหม่และเหมาะกับงานพิมพ์ทั่วไป',
+      },
+      {
+        ecoScore: 8,
+        id: 'regular-paper',
+        label: 'กระดาษขาว ไม่ระบุแหล่งที่มา',
+        price: 180,
+        reason: 'ยังไม่มีข้อมูลแหล่งที่มาหรือการรับรองสิ่งแวดล้อม',
+      },
+    ],
+  },
+  {
+    category: 'ทำความสะอาด',
+    mission: 'เลือกน้ำยาสำหรับทีมแม่บ้าน',
+    options: [
+      {
+        ecoScore: 25,
+        id: 'eco-cleaner',
+        label: 'น้ำยาทำความสะอาด Eco Label',
+        price: 190,
+        reason: 'ลดสารเคมีรุนแรงและมีข้อมูลการใช้งานชัดเจน',
+      },
+      {
+        ecoScore: 6,
+        id: 'strong-cleaner',
+        label: 'น้ำยาเข้มข้น ไม่ระบุฉลากสิ่งแวดล้อม',
+        price: 110,
+        reason: 'ราคาถูกกว่า แต่ข้อมูลผลกระทบและความปลอดภัยไม่ชัดเจน',
+      },
+    ],
+  },
+  {
+    category: 'จัดเลี้ยง',
+    mission: 'เตรียมแก้วสำหรับกิจกรรมภายใน',
+    options: [
+      {
+        ecoScore: 25,
+        id: 'reusable-cup',
+        label: 'แก้วใช้ซ้ำพร้อมจุดล้างคืน',
+        price: 280,
+        reason: 'ลงทุนครั้งเดียวและลดขยะจากกิจกรรมครั้งต่อไปได้',
+      },
+      {
+        ecoScore: 5,
+        id: 'single-use-cup',
+        label: 'แก้วพลาสติกใช้ครั้งเดียว 100 ใบ',
+        price: 120,
+        reason: 'ประหยัดงบระยะสั้นแต่สร้างขยะทันทีหลังจบกิจกรรม',
+      },
+    ],
+  },
+]
+
+const SAFETY_PAIRS = [
+  {
+    hazard: 'สายไฟพาดทางเดิน',
+    id: 'cable',
+    solution: 'ใช้รางครอบสายและย้ายพ้นทางเดิน',
+  },
+  {
+    hazard: 'พื้นเปียกไม่มีป้ายเตือน',
+    id: 'spill',
+    solution: 'เช็ดพื้นและตั้งป้ายจนกว่าจะแห้ง',
+  },
+  {
+    hazard: 'กล่องวางบังทางออกฉุกเฉิน',
+    id: 'exit',
+    solution: 'ย้ายสิ่งกีดขวางและรักษาทางออกให้โล่ง',
+  },
+  {
+    hazard: 'แฟ้มเอกสารกองสูงเสี่ยงหล่น',
+    id: 'stack',
+    solution: 'เก็บในชั้นมั่นคงและไม่วางสูงเกินไป',
+  },
+  {
+    hazard: 'ขวดสารเคมีไม่มีฉลาก',
+    id: 'chemical',
+    solution: 'ติดฉลากและเก็บแยกในตู้เฉพาะ',
+  },
+]
+
+type SafetyCard = {
+  id: string
+  kind: 'hazard' | 'solution'
+  pairId: string
+  text: string
+}
+
 export function GameHubPage() {
   const [activeGameId, setActiveGameId] = useState<MeaGoGameId>(
     'green-office-manager'
@@ -349,37 +528,39 @@ export function GameHubPage() {
   return (
     <main className="min-h-dvh bg-[#f7f8f3] text-[#111111]">
       <header className="sticky top-0 z-50 border-b border-[#eceee7] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 py-3 sm:px-8 sm:py-4">
+          <div className="flex min-w-0 items-center gap-3">
             <Button
+              aria-label="ย้อนกลับหน้าหลัก"
               className="rounded-base border-[#e1e1e1] bg-white text-[#111111] hover:bg-[#f7f8f3]"
               nativeButton={false}
               render={<Link href="/" />}
             >
               <IconArrowLeft data-icon="inline-start" />
-              ย้อนกลับ
+              <span className="hidden sm:inline">ย้อนกลับ</span>
             </Button>
             <Link className="flex items-center gap-3 font-bold" href="/">
               <span className="rounded-base flex size-10 items-center justify-center bg-[#111111] text-[#5df591]">
                 <IconLeaf aria-hidden="true" />
               </span>
-              Go Green
+              <span className="hidden sm:inline">Go Green</span>
             </Link>
           </div>
           <Button
+            aria-label="เปิดเกมแยกขยะ 4 สี"
             className="rounded-base bg-[#5df591] font-bold text-[#111111] hover:bg-[#49db7b]"
             nativeButton={false}
             render={<Link href="/game/waste-sort" />}
           >
             <IconRecycle data-icon="inline-start" />
-            เกมแยกขยะ 4 สี
+            <span className="hidden sm:inline">เกมแยกขยะ 4 สี</span>
           </Button>
         </div>
       </header>
 
       <LearningHubHero />
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[380px_minmax(0,1fr)] lg:py-12">
+      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 sm:px-8 lg:grid-cols-[320px_minmax(0,1fr)] lg:py-10">
         <GameCatalogNav
           activeGameId={activeGame.id}
           onSelectGame={setActiveGameId}
@@ -390,141 +571,289 @@ export function GameHubPage() {
   )
 }
 
-function EnergyHunterGame() {
-  const [foundIds, setFoundIds] = useState<string[]>([])
-  const [running, setRunning] = useState(false)
-  const [secondsLeft, setSecondsLeft] = useState(45)
-  const [finished, setFinished] = useState(false)
-  const complete = foundIds.length === ENERGY_HOTSPOTS.length
+function createSafetyDeck(shuffle = false): SafetyCard[] {
+  const cards = SAFETY_PAIRS.flatMap((pair) => [
+    {
+      id: `${pair.id}-hazard`,
+      kind: 'hazard' as const,
+      pairId: pair.id,
+      text: pair.hazard,
+    },
+    {
+      id: `${pair.id}-solution`,
+      kind: 'solution' as const,
+      pairId: pair.id,
+      text: pair.solution,
+    },
+  ])
 
-  function findHotspot(id: string) {
-    if (!running || foundIds.includes(id)) return
-
-    const nextFoundIds = [...foundIds, id]
-    setFoundIds(nextFoundIds)
-    if (nextFoundIds.length === ENERGY_HOTSPOTS.length) {
-      setRunning(false)
-      setFinished(true)
+  if (shuffle) {
+    for (let index = cards.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1))
+      ;[cards[index], cards[randomIndex]] = [cards[randomIndex], cards[index]]
     }
   }
 
-  function start() {
-    setFoundIds([])
-    setSecondsLeft(45)
-    setFinished(false)
-    setRunning(true)
+  return cards
+}
+
+function EnergyHunterGame() {
+  const [roundIndex, setRoundIndex] = useState(0)
+  const [lives, setLives] = useState(3)
+  const [finished, setFinished] = useState(false)
+  const [started, setStarted] = useState(false)
+  const [selectedDecision, setSelectedDecision] = useState<
+    'continue' | 'stop' | null
+  >(null)
+  const [combo, setCombo] = useState(0)
+  const [score, setScore] = useState(0)
+  const currentSituation = ENERGY_GAME_SITUATIONS[roundIndex]
+  const answeredCorrectly =
+    selectedDecision !== null &&
+    currentSituation !== undefined &&
+    (selectedDecision === 'stop') === currentSituation.isWaste
+
+  function answer(decision: 'continue' | 'stop') {
+    if (!started || finished || selectedDecision || !currentSituation) return
+
+    const correct = (decision === 'stop') === currentSituation.isWaste
+    setSelectedDecision(decision)
+
+    if (correct) {
+      const nextCombo = combo + 1
+      setCombo(nextCombo)
+      setScore((current) => current + 100 + Math.max(0, nextCombo - 1) * 20)
+      return
+    }
+
+    setCombo(0)
+    setLives((current) => Math.max(0, current - 1))
   }
 
-  useEffect(() => {
-    if (!running || finished) return
+  function continueGame() {
+    if (roundIndex === ENERGY_GAME_SITUATIONS.length - 1 || lives === 0) {
+      setFinished(true)
+      setStarted(false)
+      return
+    }
 
-    const timer = window.setInterval(() => {
-      setSecondsLeft((current) => {
-        if (current <= 1) {
-          window.clearInterval(timer)
-          setRunning(false)
-          setFinished(true)
-          return 0
-        }
+    setRoundIndex((current) => current + 1)
+    setSelectedDecision(null)
+  }
 
-        return current - 1
-      })
-    }, 1000)
-
-    return () => window.clearInterval(timer)
-  }, [finished, running])
+  function start() {
+    setRoundIndex(0)
+    setLives(3)
+    setFinished(false)
+    setStarted(true)
+    setSelectedDecision(null)
+    setCombo(0)
+    setScore(0)
+  }
 
   return (
     <section className="grid gap-5">
       <GameStatusBar
         accent="#7a5c00"
         items={[
-          { label: 'เวลา', value: `${secondsLeft}s` },
           {
-            label: 'พบแล้ว',
-            value: `${foundIds.length}/${ENERGY_HOTSPOTS.length}`,
+            label: 'สถานการณ์',
+            value: `${Math.min(roundIndex + 1, ENERGY_GAME_SITUATIONS.length)}/${ENERGY_GAME_SITUATIONS.length}`,
           },
-          { label: 'คะแนน', value: `${foundIds.length * 20}` },
+          {
+            label: 'พลังชีวิต',
+            value: `${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)}`,
+          },
+          { label: 'คะแนน / คอมโบ', value: `${score} · x${combo}` },
         ]}
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <OfficeScene
-          disabled={!running}
-          foundIds={foundIds}
-          hotspots={ENERGY_HOTSPOTS}
-          onFindHotspot={findHotspot}
-          tone="energy"
-        />
-        <GameInstructionPanel
-          actionLabel={running ? 'กำลังค้นหา' : 'เริ่มจับเวลา'}
-          disabled={running}
-          icon={<IconBolt aria-hidden="true" className="size-5" />}
-          onAction={start}
-          title="หาให้ครบก่อนหมดเวลา"
-        >
-          คลิกจุดที่สิ้นเปลืองพลังงานในสำนักงาน เช่น ไฟ แอร์ จอคอมพิวเตอร์
-          หรือปลั๊กที่เปิดทิ้งไว้
-        </GameInstructionPanel>
-      </div>
+      {!started && !finished ? (
+        <section className="overflow-hidden border border-[#111111] bg-white">
+          <div className="bg-[#111111] p-5 text-white sm:p-7">
+            <div className="flex items-start gap-4">
+              <span className="rounded-base grid size-12 shrink-0 place-items-center bg-[#facc00] text-[#111111]">
+                <IconTargetArrow aria-hidden="true" className="size-6" />
+              </span>
+              <div>
+                <p className="font-bold text-[#facc00]">ภารกิจของคุณ</p>
+                <h3 className="mt-2 text-2xl leading-tight font-bold sm:text-3xl">
+                  อ่านสถานการณ์ แล้วเลือกให้ถูก
+                </h3>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/72">
+                  เกมจะแสดงสถานการณ์ในสำนักงานทีละข้อ คุณมีพลังชีวิต 3 ดวง
+                  และได้โบนัสเมื่อเลือกถูกต่อเนื่อง
+                </p>
+              </div>
+            </div>
+          </div>
 
-      <FoundFeedback
-        emptyText="เริ่มเกมแล้วคลิกจุดสิ้นเปลืองพลังงานเพื่อดูคำแนะนำ"
-        foundIds={foundIds}
-        hotspots={ENERGY_HOTSPOTS}
-      />
+          <div className="grid gap-3 p-5 sm:grid-cols-2 sm:p-7">
+            <div className="border border-[#111111] bg-[#fff8d7] p-4">
+              <div className="flex items-center gap-2 font-bold">
+                <IconBolt aria-hidden="true" className="size-5" />
+                หยุดพลังงาน
+              </div>
+              <p className="mt-2 text-sm leading-6 text-[#5f5000]">
+                เลือกเมื่อไม่มีคนใช้ เปิดทิ้งไว้ หรือใช้มากเกินจำเป็น
+              </p>
+            </div>
+            <div className="border border-[#111111] bg-[#effff3] p-4">
+              <div className="flex items-center gap-2 font-bold">
+                <IconCheck aria-hidden="true" className="size-5" />
+                ใช้งานต่อได้
+              </div>
+              <p className="mt-2 text-sm leading-6 text-[#234734]">
+                เลือกเมื่อกำลังใช้งานจริง หรือมีระบบประหยัดพลังงานอยู่แล้ว
+              </p>
+            </div>
+            <Button
+              className="mt-1 bg-[#facc00] font-bold text-[#111111] hover:bg-[#e5b900] sm:col-span-2 sm:justify-self-center"
+              onClick={start}
+              type="button"
+            >
+              <IconPlayerPlay data-icon="inline-start" />
+              เริ่มภารกิจ 10 สถานการณ์
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
+      {started && !finished && currentSituation ? (
+        <section className="overflow-hidden border border-[#111111] bg-white">
+          <div className="h-2 bg-[#e8eadf]">
+            <div
+              className="h-full bg-[#facc00] transition-[width] duration-200"
+              style={{
+                width: `${((roundIndex + (selectedDecision ? 1 : 0)) / ENERGY_GAME_SITUATIONS.length) * 100}%`,
+              }}
+            />
+          </div>
+
+          <div className="bg-[#111111] p-5 text-white sm:p-7">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="border border-white/25 px-3 py-1 text-sm font-bold text-[#facc00]">
+                สถานการณ์ {roundIndex + 1} · {currentSituation.zone}
+              </span>
+              <span className="text-sm font-bold text-white/60">
+                อ่านสิ่งที่เกิดขึ้นก่อนเลือก
+              </span>
+            </div>
+            <div className="mt-7 flex items-start gap-4">
+              <span className="rounded-base grid size-12 shrink-0 place-items-center bg-[#facc00] text-[#111111]">
+                <IconBolt aria-hidden="true" className="size-6" />
+              </span>
+              <div>
+                <p className="text-lg font-bold text-[#facc00]">
+                  {currentSituation.label}
+                </p>
+                <h3 className="mt-2 max-w-3xl text-2xl leading-tight font-bold text-balance sm:text-3xl">
+                  {currentSituation.signal}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 p-5 sm:grid-cols-2 sm:p-7">
+            <button
+              aria-pressed={selectedDecision === 'stop'}
+              className={cn(
+                'flex min-h-24 items-center gap-4 border border-[#111111] bg-[#fff8d7] p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:bg-[#fff1a6] focus-visible:ring-2 focus-visible:ring-[#facc00] focus-visible:ring-offset-2 focus-visible:outline-none',
+                selectedDecision && 'cursor-default opacity-45',
+                selectedDecision === 'stop' && 'opacity-100'
+              )}
+              disabled={selectedDecision !== null}
+              onClick={() => answer('stop')}
+              type="button"
+            >
+              <span className="rounded-base grid size-10 shrink-0 place-items-center bg-[#facc00]">
+                <IconBolt aria-hidden="true" className="size-5" />
+              </span>
+              <span>
+                <strong className="block">หยุดพลังงาน</strong>
+                <span className="mt-1 block text-sm text-[#5f5000]">
+                  ปิดหรือปรับทันที
+                </span>
+              </span>
+            </button>
+
+            <button
+              aria-pressed={selectedDecision === 'continue'}
+              className={cn(
+                'flex min-h-24 items-center gap-4 border border-[#111111] bg-[#effff3] p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:bg-[#d9fbe2] focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none',
+                selectedDecision && 'cursor-default opacity-45',
+                selectedDecision === 'continue' && 'opacity-100'
+              )}
+              disabled={selectedDecision !== null}
+              onClick={() => answer('continue')}
+              type="button"
+            >
+              <span className="rounded-base grid size-10 shrink-0 place-items-center bg-[#5df591]">
+                <IconCheck aria-hidden="true" className="size-5" />
+              </span>
+              <span>
+                <strong className="block">ใช้งานต่อได้</strong>
+                <span className="mt-1 block text-sm text-[#234734]">
+                  เป็นการใช้งานที่เหมาะสม
+                </span>
+              </span>
+            </button>
+          </div>
+
+          {selectedDecision ? (
+            <div
+              aria-live="polite"
+              className={cn(
+                'grid gap-4 border-t border-[#111111] p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6',
+                answeredCorrectly ? 'bg-[#5df591]' : 'bg-[#ffb38d]'
+              )}
+            >
+              <div className="flex items-start gap-3">
+                <span className="rounded-base grid size-9 shrink-0 place-items-center bg-[#111111] text-white">
+                  {answeredCorrectly ? (
+                    <IconCheck aria-hidden="true" className="size-5" />
+                  ) : (
+                    <IconX aria-hidden="true" className="size-5" />
+                  )}
+                </span>
+                <div>
+                  <p className="font-bold">
+                    {answeredCorrectly
+                      ? `ถูกต้อง${combo > 1 ? ` · คอมโบ x${combo}` : ''}`
+                      : `ยังไม่ใช่ · คำตอบคือ ${currentSituation.isWaste ? 'หยุดพลังงาน' : 'ใช้งานต่อได้'}`}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-[#282c28]">
+                    {currentSituation.tip}
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="bg-[#111111] text-white hover:bg-[#2a2a2a]"
+                onClick={continueGame}
+                type="button"
+              >
+                {roundIndex === ENERGY_GAME_SITUATIONS.length - 1 || lives === 0
+                  ? 'ดูผลลัพธ์'
+                  : 'สถานการณ์ถัดไป'}
+              </Button>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {finished ? (
         <GameResult
           actionLabel="เล่น Energy Hunter อีกครั้ง"
           detail={
-            complete
-              ? 'ยอดเยี่ยม พบจุดสิ้นเปลืองพลังงานครบทั้งหมด'
-              : 'หมดเวลาแล้ว ลองเล่นอีกครั้งเพื่อหาจุดที่เหลือให้ครบ'
+            lives > 0 && score >= 900
+              ? 'ยอดเยี่ยม แยกการใช้พลังงานที่จำเป็นออกจากจุดสิ้นเปลืองได้แม่นยำ'
+              : 'ลองอีกครั้ง โดยดูว่าพื้นที่กำลังถูกใช้งานจริงหรือมีอุปกรณ์เปิดทิ้งไว้'
           }
           onRestart={start}
-          score={foundIds.length * 20}
+          score={score + lives * 50}
           title="สรุป Energy Hunter"
         />
       ) : null}
-    </section>
-  )
-}
-
-function FoundFeedback({
-  emptyText,
-  foundIds,
-  hotspots,
-}: {
-  emptyText: string
-  foundIds: string[]
-  hotspots: typeof ENERGY_HOTSPOTS
-}) {
-  const foundItems = hotspots.filter((item) => foundIds.includes(item.id))
-
-  return (
-    <section className="border border-[#e4e8df] bg-white p-5">
-      <h3 className="font-bold">Feedback ที่พบแล้ว</h3>
-      {foundItems.length > 0 ? (
-        <ul className="mt-3 grid gap-2">
-          {foundItems.map((item) => (
-            <li
-              className="flex gap-3 border border-[#e4e8df] bg-[#effff3] p-3 text-sm leading-6"
-              key={item.id}
-            >
-              <IconCheck
-                aria-hidden="true"
-                className="mt-0.5 size-5 shrink-0 text-[#168542]"
-              />
-              <span>
-                <strong>{item.label}</strong>: {item.tip}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-3 text-sm leading-6 text-[#5a615b]">{emptyText}</p>
-      )}
     </section>
   )
 }
@@ -551,7 +880,10 @@ function GameCatalogNav({
           </div>
         </div>
 
-        <nav aria-label="เลือกเกม MEA GO" className="mt-5 grid gap-2">
+        <nav
+          aria-label="เลือกเกม MEA GO"
+          className="mt-5 grid grid-cols-2 gap-2 lg:grid-cols-1"
+        >
           {MEA_GO_GAMES.map((game) => {
             const Icon = game.icon
             const active = activeGameId === game.id
@@ -560,14 +892,14 @@ function GameCatalogNav({
               <button
                 aria-pressed={active}
                 className={cn(
-                  'group border border-[#e4e8df] bg-[#f7f8f3] p-4 text-left transition hover:border-[#111111] focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none',
+                  'group min-h-32 border border-[#e4e8df] bg-[#f7f8f3] p-3 text-left transition hover:border-[#111111] focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none lg:min-h-0 lg:p-4',
                   active && 'border-[#111111] bg-[#111111] text-white'
                 )}
                 key={game.id}
                 onClick={() => onSelectGame(game.id)}
                 type="button"
               >
-                <span className="flex items-start gap-3">
+                <span className="flex flex-col items-start gap-3 lg:flex-row">
                   <span
                     className={cn(
                       'rounded-base grid size-11 shrink-0 place-items-center text-[#111111]',
@@ -583,7 +915,7 @@ function GameCatalogNav({
                     <span className="block font-bold">{game.title}</span>
                     <span
                       className={cn(
-                        'mt-1 block text-sm leading-5',
+                        'mt-1 hidden text-sm leading-5 sm:block',
                         active ? 'text-white/72' : 'text-[#5a615b]'
                       )}
                     >
@@ -597,7 +929,7 @@ function GameCatalogNav({
         </nav>
       </section>
 
-      <section className="border border-[#111111] bg-[#5df591] p-5 text-[#111111]">
+      <section className="hidden border border-[#111111] bg-[#5df591] p-5 text-[#111111] lg:block">
         <p className="text-sm font-bold">Learning outcome</p>
         <p className="mt-2 text-2xl leading-tight font-bold">
           เลือกเกมให้ตรงกับพฤติกรรมที่อยากเปลี่ยน
@@ -607,41 +939,6 @@ function GameCatalogNav({
           แล้วสรุปกลับเป็นแนวทางปฏิบัติจริง
         </p>
       </section>
-    </aside>
-  )
-}
-
-function GameInstructionPanel({
-  actionLabel,
-  children,
-  disabled,
-  icon,
-  onAction,
-  title,
-}: {
-  actionLabel: string
-  children: React.ReactNode
-  disabled?: boolean
-  icon: React.ReactNode
-  onAction: () => void
-  title: string
-}) {
-  return (
-    <aside className="border border-[#111111] bg-[#111111] p-5 text-white">
-      <div className="flex items-center gap-2 text-[#5df591]">
-        {icon}
-        <h3 className="font-bold">{title}</h3>
-      </div>
-      <p className="mt-3 text-sm leading-6 text-white/72">{children}</p>
-      <Button
-        className="mt-5 w-full bg-[#5df591] font-bold text-[#111111] hover:bg-[#49db7b]"
-        disabled={disabled}
-        onClick={onAction}
-        type="button"
-      >
-        <IconPlayerPlay data-icon="inline-start" />
-        {actionLabel}
-      </Button>
     </aside>
   )
 }
@@ -692,17 +989,6 @@ function GamePlayArena({ game }: { game: (typeof MEA_GO_GAMES)[number] }) {
       </div>
 
       <div className="p-5 sm:p-7">
-        <div className="mb-5 grid gap-3 border border-[#e4e8df] bg-[#effff3] p-4 md:grid-cols-3">
-          {['อ่านโจทย์', 'เลือกหรือคลิก', 'ดู feedback'].map((step) => (
-            <div className="flex items-center gap-3" key={step}>
-              <span className="rounded-base grid size-8 shrink-0 place-items-center bg-[#111111] text-[#5df591]">
-                <IconCheck aria-hidden="true" className="size-4" />
-              </span>
-              <span className="font-bold">{step}</span>
-            </div>
-          ))}
-        </div>
-
         {game.id === 'green-office-manager' ? <GreenOfficeManagerGame /> : null}
         {game.id === 'energy-hunter' ? <EnergyHunterGame /> : null}
         {game.id === 'green-shopping-challenge' ? (
@@ -773,29 +1059,40 @@ function GameStatusBar({
 }
 
 function GreenOfficeManagerGame() {
-  const [answers, setAnswers] = useState<number[]>([])
-  const [finished, setFinished] = useState(false)
-  const currentScenario = OFFICE_MANAGER_SCENARIOS[answers.length]
-  const totalScore = answers.reduce(
-    (sum, answerIndex, scenarioIndex) =>
-      sum + OFFICE_MANAGER_SCENARIOS[scenarioIndex].options[answerIndex].effect,
-    0
+  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0)
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<null | number>(
+    null
   )
-  const maxScore = OFFICE_MANAGER_SCENARIOS.length * 10
+  const [score, setScore] = useState(0)
+  const [trust, setTrust] = useState(3)
+  const [combo, setCombo] = useState(0)
+  const currentScenario = OFFICE_MANAGER_SCENARIOS[currentScenarioIndex]
+  const finished = currentScenarioIndex >= OFFICE_MANAGER_SCENARIOS.length
 
-  function choose(optionIndex: number) {
-    if (finished || !currentScenario) return
+  function chooseOption(optionIndex: number) {
+    if (finished || selectedOptionIndex !== null || !currentScenario) return
 
-    const nextAnswers = [...answers, optionIndex]
-    setAnswers(nextAnswers)
-    if (nextAnswers.length === OFFICE_MANAGER_SCENARIOS.length) {
-      setFinished(true)
-    }
+    const option = currentScenario.options[optionIndex]
+    const nextCombo = option.effect === 10 ? combo + 1 : 0
+    const earnedScore = option.effect * 10 + Math.max(0, nextCombo - 1) * 20
+
+    setSelectedOptionIndex(optionIndex)
+    setScore((current) => current + earnedScore)
+    setCombo(nextCombo)
+    if (option.effect <= 1) setTrust((current) => Math.max(0, current - 1))
+  }
+
+  function continueGame() {
+    setSelectedOptionIndex(null)
+    setCurrentScenarioIndex((current) => current + 1)
   }
 
   function restart() {
-    setAnswers([])
-    setFinished(false)
+    setCurrentScenarioIndex(0)
+    setSelectedOptionIndex(null)
+    setScore(0)
+    setTrust(3)
+    setCombo(0)
   }
 
   return (
@@ -805,61 +1102,125 @@ function GreenOfficeManagerGame() {
         items={[
           {
             label: 'สถานการณ์',
-            value: `${Math.min(answers.length + 1, OFFICE_MANAGER_SCENARIOS.length)}/${OFFICE_MANAGER_SCENARIOS.length}`,
+            value: `${Math.min(currentScenarioIndex + 1, OFFICE_MANAGER_SCENARIOS.length)}/${OFFICE_MANAGER_SCENARIOS.length}`,
           },
-          { label: 'Green Score', value: `${totalScore}/${maxScore}` },
-          { label: 'ตัวเลือกที่ทำแล้ว', value: `${answers.length}` },
+          {
+            label: 'ชื่อเสียงทีม',
+            value: `${'♥'.repeat(trust)}${'♡'.repeat(3 - trust)}`,
+          },
+          { label: 'คะแนน / คอมโบ', value: `${score} · x${combo}` },
         ]}
       />
 
       {!finished && currentScenario ? (
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
-          <section className="border border-[#111111] bg-[#f7f8f3] p-5 sm:p-6">
-            <p className="text-sm font-bold text-[#168542]">
-              สถานการณ์ในสำนักงาน
-            </p>
-            <h3 className="mt-2 text-2xl leading-tight font-bold">
+        <div className="overflow-hidden border border-[#111111] bg-white">
+          <div className="bg-[#111111] p-5 text-white sm:p-7">
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-bold text-[#5df591]">
+                ภารกิจ {currentScenarioIndex + 1}
+              </p>
+              <span className="flex items-center gap-1 text-sm font-bold text-white/70">
+                <IconHeart
+                  aria-hidden="true"
+                  className="size-4 text-[#ff9f6e]"
+                />
+                รักษาความเชื่อมั่นของทีม
+              </span>
+            </div>
+            <h3 className="mt-4 max-w-3xl text-2xl leading-tight font-bold text-balance sm:text-3xl">
               {currentScenario.prompt}
             </h3>
-            <div className="mt-5 grid gap-3">
-              {currentScenario.options.map((option, index) => (
+          </div>
+
+          <div className="grid gap-3 p-4 sm:p-6">
+            {currentScenario.options.map((option, optionIndex) => {
+              const selected = selectedOptionIndex === optionIndex
+              const answered = selectedOptionIndex !== null
+
+              return (
                 <button
-                  className="border border-[#d7ddd4] bg-white p-4 text-left transition hover:border-[#111111] hover:bg-[#effff3] focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none"
+                  className={cn(
+                    'flex min-h-20 items-center justify-between gap-4 border border-[#d7ddd4] bg-white p-4 text-left transition duration-200 focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none',
+                    !answered &&
+                      'hover:-translate-y-0.5 hover:border-[#111111] hover:bg-[#effff3]',
+                    selected &&
+                      option.effect === 10 &&
+                      'border-[#111111] bg-[#effff3]',
+                    selected &&
+                      option.effect < 10 &&
+                      'border-[#111111] bg-[#fff4ea]',
+                    answered && !selected && 'opacity-45'
+                  )}
+                  disabled={answered}
                   key={option.label}
-                  onClick={() => choose(index)}
+                  onClick={() => chooseOption(optionIndex)}
                   type="button"
                 >
                   <span className="font-bold">{option.label}</span>
-                  <span className="mt-1 block text-sm text-[#5a615b]">
-                    +{option.effect} Green Score
+                  <span className="rounded-base grid size-9 shrink-0 place-items-center border border-[#111111] bg-[#f7f8f3]">
+                    {selected ? (
+                      option.effect === 10 ? (
+                        <IconCheck
+                          aria-hidden="true"
+                          className="size-5 text-[#168542]"
+                        />
+                      ) : (
+                        <IconAlertTriangle
+                          aria-hidden="true"
+                          className="size-5 text-[#9a3d16]"
+                        />
+                      )
+                    ) : (
+                      <span className="text-sm font-bold">?</span>
+                    )}
                   </span>
                 </button>
-              ))}
+              )
+            })}
+          </div>
+
+          {selectedOptionIndex !== null ? (
+            <div
+              aria-live="polite"
+              className="grid gap-4 border-t border-[#111111] bg-[#5df591] p-5 sm:grid-cols-[1fr_auto] sm:items-center"
+            >
+              <div>
+                <p className="font-bold">
+                  +{currentScenario.options[selectedOptionIndex].effect * 10}{' '}
+                  คะแนน
+                  {currentScenario.options[selectedOptionIndex].effect === 10 &&
+                  combo > 1
+                    ? ` · โบนัสคอมโบ +${(combo - 1) * 20}`
+                    : ''}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-[#173d2a]">
+                  {currentScenario.options[selectedOptionIndex].feedback}
+                </p>
+              </div>
+              <Button
+                className="bg-[#111111] text-white hover:bg-[#2a2a2a]"
+                onClick={continueGame}
+                type="button"
+              >
+                {currentScenarioIndex === OFFICE_MANAGER_SCENARIOS.length - 1
+                  ? 'ดูผลลัพธ์'
+                  : 'ภารกิจถัดไป'}
+              </Button>
             </div>
-          </section>
-          <aside className="border border-[#111111] bg-[#5df591] p-5 text-[#111111]">
-            <IconBuildingCommunity aria-hidden="true" className="size-8" />
-            <h3 className="mt-4 text-xl font-bold">เลือกแนวทางบริหาร</h3>
-            <p className="mt-2 text-sm leading-6 text-[#173d2a]">
-              คะแนนสูงมาจากทางเลือกที่ลดการใช้ทรัพยากร สื่อสารให้ทีมทำตามได้
-              และเก็บข้อมูลต่อเนื่อง
-            </p>
-          </aside>
+          ) : null}
         </div>
       ) : null}
-
-      <OfficeManagerFeedback answers={answers} />
 
       {finished ? (
         <GameResult
           actionLabel="เริ่มบริหารใหม่"
           detail={
-            totalScore >= 35
-              ? 'บริหารได้ดีมาก เห็นทั้งพลังงาน กระดาษ ขยะ และการจัดซื้อ'
+            score >= 360
+              ? 'บริหารได้ยอดเยี่ยม รักษาชื่อเสียงทีมและตัดสินใจเชิงระบบได้ครบ'
               : 'ยังมีโอกาสเพิ่มคะแนนด้วยการเลือกแนวทางที่ลดทรัพยากรตั้งแต่ต้นทาง'
           }
           onRestart={restart}
-          score={totalScore}
+          score={score + trust * 25}
           title="สรุป Green Office Manager"
         />
       ) : null}
@@ -869,125 +1230,164 @@ function GreenOfficeManagerGame() {
 
 function GreenShoppingChallengeGame() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [roundIndex, setRoundIndex] = useState(0)
+  const [secondsLeft, setSecondsLeft] = useState(30)
+  const [running, setRunning] = useState(false)
   const [finished, setFinished] = useState(false)
-  const selectedItems = SHOPPING_ITEMS.filter((item) =>
-    selectedIds.includes(item.id)
-  )
+  const selectedItems = SHOPPING_ROUNDS.flatMap(
+    (round) => round.options
+  ).filter((item) => selectedIds.includes(item.id))
   const spent = selectedItems.reduce((sum, item) => sum + item.price, 0)
   const ecoScore = selectedItems.reduce((sum, item) => sum + item.ecoScore, 0)
-  const overBudget = spent > SHOPPING_BUDGET
-  const canFinish = selectedItems.length >= 4 && !overBudget
+  const currentRound = SHOPPING_ROUNDS[roundIndex]
 
-  function toggleItem(id: string) {
-    if (finished) return
-    setSelectedIds((current) =>
-      current.includes(id)
-        ? current.filter((itemId) => itemId !== id)
-        : [...current, id]
-    )
+  function chooseItem(
+    item: (typeof SHOPPING_ROUNDS)[number]['options'][number]
+  ) {
+    if (!running || finished || spent + item.price > SHOPPING_BUDGET) return
+
+    setSelectedIds((current) => [...current, item.id])
+    if (roundIndex === SHOPPING_ROUNDS.length - 1) {
+      setRunning(false)
+      setFinished(true)
+      return
+    }
+
+    setRoundIndex((current) => current + 1)
   }
 
-  function restart() {
+  function start() {
     setSelectedIds([])
+    setRoundIndex(0)
+    setSecondsLeft(30)
     setFinished(false)
+    setRunning(true)
   }
+
+  useEffect(() => {
+    if (!running || finished) return
+
+    const timer = window.setInterval(() => {
+      setSecondsLeft((current) => {
+        if (current <= 1) {
+          window.clearInterval(timer)
+          setRunning(false)
+          setFinished(true)
+          return 0
+        }
+
+        return current - 1
+      })
+    }, 1000)
+
+    return () => window.clearInterval(timer)
+  }, [finished, running])
 
   return (
     <section className="grid gap-5">
       <GameStatusBar
-        accent={overBudget ? '#c94a24' : '#168542'}
+        accent="#167093"
         items={[
-          { label: 'งบประมาณ', value: `${spent}/${SHOPPING_BUDGET}` },
-          { label: 'สินค้า', value: `${selectedItems.length}` },
-          { label: 'Eco Score', value: `${ecoScore}` },
+          { label: 'งบคงเหลือ', value: `${SHOPPING_BUDGET - spent} บาท` },
+          { label: 'เวลา', value: `${secondsLeft}s` },
+          { label: 'Eco Score', value: `${ecoScore}/100` },
         ]}
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <section className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3">
-          {SHOPPING_ITEMS.map((item) => {
-            const active = selectedIds.includes(item.id)
+      {!finished && currentRound ? (
+        <section className="overflow-hidden border border-[#111111] bg-white">
+          <div className="flex flex-col gap-4 bg-[#111111] p-5 text-white sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-bold text-[#8ce3ff]">
+                ใบสั่งซื้อ {roundIndex + 1}/{SHOPPING_ROUNDS.length} ·{' '}
+                {currentRound.category}
+              </p>
+              <h3 className="mt-2 text-2xl font-bold">
+                {currentRound.mission}
+              </h3>
+            </div>
+            <Button
+              className="shrink-0 bg-[#8ce3ff] font-bold text-[#111111] hover:bg-[#70d8fa]"
+              disabled={running}
+              onClick={start}
+              type="button"
+            >
+              <IconPlayerPlay data-icon="inline-start" />
+              เริ่มภารกิจ 30 วิ
+            </Button>
+          </div>
 
-            return (
-              <button
-                aria-pressed={active}
-                className={cn(
-                  'border border-[#d7ddd4] bg-white p-4 text-left transition hover:border-[#111111] focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none',
-                  active && 'border-[#111111] bg-[#effff3]'
-                )}
-                key={item.id}
-                onClick={() => toggleItem(item.id)}
-                type="button"
-              >
-                <span className="flex items-start justify-between gap-3">
-                  <span>
-                    <span className="block font-bold">{item.label}</span>
-                    <span className="mt-1 block text-xs font-bold text-[#168542]">
-                      {item.category}
+          <div className="grid gap-4 p-4 sm:p-6 md:grid-cols-2">
+            {currentRound.options.map((item) => {
+              const unaffordable = spent + item.price > SHOPPING_BUDGET
+
+              return (
+                <button
+                  className={cn(
+                    'group flex min-h-64 flex-col border border-[#111111] bg-white p-5 text-left transition duration-200 focus-visible:ring-2 focus-visible:ring-[#8ce3ff] focus-visible:ring-offset-2 focus-visible:outline-none',
+                    running &&
+                      !unaffordable &&
+                      'hover:-translate-y-1 hover:bg-[#f1fbff]',
+                    (!running || unaffordable) &&
+                      'cursor-not-allowed opacity-55'
+                  )}
+                  disabled={!running || unaffordable}
+                  key={item.id}
+                  onClick={() => chooseItem(item)}
+                  type="button"
+                >
+                  <span className="flex w-full items-start justify-between gap-3">
+                    <span className="rounded-base bg-[#e9f9ff] px-2 py-1 text-xs font-bold text-[#12617e]">
+                      ตัวเลือกจัดซื้อ
+                    </span>
+                    <span className="flex items-center gap-1 font-bold">
+                      <IconCoin aria-hidden="true" className="size-4" />
+                      {item.price} บาท
                     </span>
                   </span>
-                  {active ? (
-                    <IconCheck
-                      aria-hidden="true"
-                      className="size-5 shrink-0 text-[#168542]"
-                    />
-                  ) : null}
-                </span>
-                <span className="mt-4 flex items-center gap-2 text-sm font-bold">
-                  <IconCoin aria-hidden="true" className="size-4" />
-                  {item.price} บาท
-                </span>
-                <span className="mt-2 block text-sm leading-6 text-[#5a615b]">
-                  {item.reason}
-                </span>
-              </button>
-            )
-          })}
+                  <span className="mt-6 block text-xl leading-tight font-bold">
+                    {item.label}
+                  </span>
+                  <span className="mt-3 block text-sm leading-6 text-[#4d5053]">
+                    {item.reason}
+                  </span>
+                  <span className="mt-auto pt-5 font-bold text-[#167093]">
+                    {unaffordable ? 'งบไม่พอ' : 'เลือกเข้าตะกร้า'}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </section>
+      ) : null}
 
-        <aside className="border border-[#111111] bg-[#111111] p-5 text-white">
-          <div className="flex items-center gap-2 text-[#5df591]">
-            <IconShoppingCart aria-hidden="true" className="size-5" />
-            <h3 className="font-bold">ตะกร้าจัดซื้อ</h3>
-          </div>
-          <p className="mt-3 text-sm leading-6 text-white/72">
-            เลือกอย่างน้อย 4 รายการโดยไม่เกินงบ 1,200 บาท
-            คะแนนสูงเมื่อเลือกสินค้าที่ลดผลกระทบต่อสิ่งแวดล้อม
-          </p>
-          <div className="mt-4 border border-white/20 bg-white/8 p-3">
-            <p className={cn('font-bold', overBudget && 'text-[#ff9f6e]')}>
-              ใช้งบ {spent} / {SHOPPING_BUDGET} บาท
-            </p>
-            <p className="mt-1 text-sm text-white/72">
-              {overBudget
-                ? 'งบเกินแล้ว ลองถอดบางรายการออก'
-                : canFinish
-                  ? 'พร้อมส่งตะกร้าแล้ว'
-                  : 'เลือกสินค้าให้ครบอย่างน้อย 4 รายการ'}
-            </p>
-          </div>
-          <Button
-            className="mt-5 w-full bg-[#5df591] font-bold text-[#111111] hover:bg-[#49db7b]"
-            disabled={!canFinish || finished}
-            onClick={() => setFinished(true)}
-            type="button"
-          >
-            <IconCheck data-icon="inline-start" />
-            ส่งตะกร้า
-          </Button>
-        </aside>
-      </div>
+      {selectedItems.length > 0 && !finished ? (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <IconShoppingCart aria-hidden="true" className="size-4" />
+          <strong>ในตะกร้า:</strong>
+          {selectedItems.map((item) => (
+            <span
+              className="border border-[#d7ddd4] bg-white px-2 py-1"
+              key={item.id}
+            >
+              {item.label}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       {finished ? (
         <GameResult
-          actionLabel="เลือกสินค้าใหม่"
+          actionLabel="รับภารกิจใหม่"
           detail={
-            ecoScore >= 80
-              ? 'ตะกร้านี้สมดุลดี เลือกของใช้ซ้ำได้ ประหยัดพลังงาน และมีข้อมูลสิ่งแวดล้อม'
-              : 'ผ่านงบแล้ว แต่ยังเพิ่ม Eco Score ได้ด้วยการเลี่ยงสินค้าใช้ครั้งเดียว'
+            selectedItems.length < SHOPPING_ROUNDS.length
+              ? 'หมดเวลาก่อนจัดซื้อครบ ลองวางแผนงบและตัดสินใจให้เร็วขึ้น'
+              : ecoScore >= 75
+                ? 'ภารกิจสำเร็จ ตะกร้านี้ผ่านเกณฑ์ Green Procurement และยังอยู่ในงบ'
+                : 'จัดซื้อครบและไม่เกินงบ แต่ยังเพิ่ม Eco Score ได้ด้วยสินค้าที่มีฉลากรับรอง'
           }
-          onRestart={restart}
-          score={ecoScore}
+          onRestart={start}
+          score={ecoScore * 10 + secondsLeft * 5 + (SHOPPING_BUDGET - spent)}
           title="สรุป Green Shopping Challenge"
         />
       ) : null}
@@ -997,204 +1397,97 @@ function GreenShoppingChallengeGame() {
 
 function LearningHubHero() {
   return (
-    <section className="border-b border-[#eceee7] bg-white">
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
-        <div>
-          <p className="rounded-base inline-flex items-center gap-2 bg-[#effff3] px-4 py-2 text-sm font-bold text-[#168542]">
-            <IconSparkles aria-hidden="true" className="size-4" />
-            Learning Platform
-          </p>
-          <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-bold tracking-[-0.03em] text-balance sm:text-7xl">
-            เรียนรู้ MEA GO
-            <span className="block text-[#168542]">ในรูปแบบเกม</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#4d5053]">
-            เปลี่ยน 4 หมวดมาตรฐานองค์กรสีเขียวให้เป็นเกมสั้น ๆ
-            ที่ช่วยให้ผู้เรียนตัดสินใจ ค้นหา เลือกซื้อ
-            และตรวจความปลอดภัยจากสถานการณ์ใกล้ตัว
-          </p>
-        </div>
-
-        <div className="bg-[#111111] p-5 text-white">
-          <div className="neo-surface bg-[#5df591] p-5 text-[#111111]">
-            <p className="text-sm font-bold">เส้นทางแนะนำ</p>
-            <h2 className="mt-3 text-3xl font-bold">Standard → Game → Habit</h2>
-            <p className="mt-3 text-sm leading-6 text-[#173d2a]">
-              เริ่มจากหมวดมาตรฐาน เล่นผ่านสถานการณ์
-              แล้วแปลงเป็นพฤติกรรมสีเขียวในสำนักงาน
+    <section className="border-b border-[#111111] bg-[#111111] text-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-7 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:py-9">
+        <div className="flex items-start gap-4">
+          <span className="rounded-base grid size-12 shrink-0 place-items-center bg-[#5df591] text-[#111111]">
+            <IconSparkles aria-hidden="true" className="size-6" />
+          </span>
+          <div>
+            <h1 className="text-3xl leading-tight font-bold tracking-[-0.02em] text-balance sm:text-4xl">
+              MEA GO Game Lab
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/72 sm:text-base">
+              เลือกเกม แล้วทำภารกิจให้สำเร็จด้วยคะแนน เวลา คอมโบ และการตัดสินใจ
             </p>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="neo-flat bg-white/8 p-4">
-              <p className="text-4xl font-bold text-[#5df591]">4</p>
-              <p className="mt-1 text-sm font-semibold text-white/72">
-                เกมหลักตาม MEA GO Standard
-              </p>
-            </div>
-            <div className="neo-flat bg-white/8 p-4">
-              <p className="text-4xl font-bold text-white">4</p>
-              <p className="mt-1 text-sm font-semibold text-white/72">
-                หมวดองค์กรสีเขียวที่ต้องฝึก
-              </p>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
-  )
-}
-
-function OfficeManagerFeedback({ answers }: { answers: number[] }) {
-  if (answers.length === 0) {
-    return (
-      <section className="border border-[#e4e8df] bg-white p-5">
-        <h3 className="font-bold">Feedback</h3>
-        <p className="mt-2 text-sm leading-6 text-[#5a615b]">
-          เลือกคำตอบแรกเพื่อดูเหตุผลและคะแนนของการตัดสินใจ
+        <p className="w-fit border border-white/25 px-3 py-2 text-sm font-bold text-[#5df591]">
+          4 เกม · 4 หมวดมาตรฐาน
         </p>
-      </section>
-    )
-  }
-
-  return (
-    <section className="border border-[#e4e8df] bg-white p-5">
-      <h3 className="font-bold">Feedback จากการตัดสินใจ</h3>
-      <ol className="mt-3 grid gap-2">
-        {answers.map((answerIndex, scenarioIndex) => {
-          const option =
-            OFFICE_MANAGER_SCENARIOS[scenarioIndex].options[answerIndex]
-
-          return (
-            <li
-              className="border border-[#e4e8df] bg-[#f7f8f3] p-3 text-sm leading-6"
-              key={`${scenarioIndex}-${answerIndex}`}
-            >
-              <strong>+{option.effect}:</strong> {option.feedback}
-            </li>
-          )
-        })}
-      </ol>
-    </section>
-  )
-}
-
-function OfficeScene({
-  disabled,
-  foundIds,
-  hotspots,
-  onFindHotspot,
-  tone,
-}: {
-  disabled?: boolean
-  foundIds: string[]
-  hotspots: typeof ENERGY_HOTSPOTS
-  onFindHotspot: (id: string) => void
-  tone: 'energy' | 'safety'
-}) {
-  return (
-    <section className="border border-[#111111] bg-[#f7f8f3] p-4 sm:p-5">
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h3 className="text-xl font-bold">
-            {tone === 'energy' ? 'บอร์ดตรวจพลังงาน' : 'บอร์ดตรวจความปลอดภัย'}
-          </h3>
-          <p className="mt-1 text-sm leading-6 text-[#5a615b]">
-            {tone === 'energy'
-              ? 'กดเริ่มจับเวลา แล้วคลิกโซนที่มีสัญญาณสิ้นเปลืองพลังงาน'
-              : 'คลิกโซนที่มีสัญญาณเสี่ยงเพื่อดูแนวทางแก้ไข'}
-          </p>
-        </div>
-        <span className="w-fit border border-[#111111] bg-white px-3 py-1 text-sm font-bold">
-          {foundIds.length}/{hotspots.length} จุด
-        </span>
-      </div>
-
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3">
-        {hotspots.map((hotspot) => {
-          const found = foundIds.includes(hotspot.id)
-
-          return (
-            <button
-              aria-label={hotspot.label}
-              aria-pressed={found}
-              className={cn(
-                'min-h-44 border border-[#d7ddd4] bg-white p-4 text-left transition focus-visible:ring-2 focus-visible:ring-[#5df591] focus-visible:ring-offset-2 focus-visible:outline-none',
-                found && 'border-[#111111] bg-[#effff3]',
-                !found &&
-                  !disabled &&
-                  'hover:border-[#111111] hover:bg-[#fffef0]',
-                disabled && !found && 'cursor-not-allowed opacity-50'
-              )}
-              disabled={disabled || found}
-              key={hotspot.id}
-              onClick={() => onFindHotspot(hotspot.id)}
-              type="button"
-            >
-              <span className="flex items-start justify-between gap-3">
-                <span>
-                  <span className="block text-xs font-bold text-[#168542]">
-                    {hotspot.zone}
-                  </span>
-                  <span className="mt-1 block text-lg leading-tight font-bold">
-                    {hotspot.label}
-                  </span>
-                </span>
-                <span
-                  className={cn(
-                    'rounded-base grid size-9 shrink-0 place-items-center border border-[#111111]',
-                    found
-                      ? 'bg-[#5df591]'
-                      : tone === 'energy'
-                        ? 'bg-[#facc00]'
-                        : 'bg-[#ff9f6e]'
-                  )}
-                >
-                  {found ? (
-                    <IconCheck aria-hidden="true" className="size-5" />
-                  ) : tone === 'energy' ? (
-                    <IconBolt aria-hidden="true" className="size-5" />
-                  ) : (
-                    <IconAlertTriangle aria-hidden="true" className="size-5" />
-                  )}
-                </span>
-              </span>
-              <span className="mt-4 block text-sm leading-6 text-[#5a615b]">
-                {found ? hotspot.tip : hotspot.signal}
-              </span>
-              <span className="mt-3 inline-flex border border-[#d7ddd4] bg-[#f7f8f3] px-2 py-1 text-xs font-bold text-[#343b35]">
-                {found
-                  ? 'แก้ไขแล้ว'
-                  : disabled
-                    ? 'กดเริ่มก่อน'
-                    : 'คลิกเพื่อตรวจ'}
-              </span>
-            </button>
-          )
-        })}
       </div>
     </section>
   )
 }
 
 function SafetyInspectorGame() {
-  const [foundIds, setFoundIds] = useState<string[]>([])
+  const [deck, setDeck] = useState<SafetyCard[]>(() => createSafetyDeck())
+  const [flippedIds, setFlippedIds] = useState<string[]>([])
+  const [matchedPairIds, setMatchedPairIds] = useState<string[]>([])
+  const [moves, setMoves] = useState(0)
+  const [started, setStarted] = useState(false)
+  const [locked, setLocked] = useState(false)
   const [finished, setFinished] = useState(false)
-  const complete = foundIds.length === SAFETY_HAZARDS.length
+  const score = Math.max(100, 1200 - moves * 60)
 
-  function findHazard(id: string) {
-    if (finished || foundIds.includes(id)) return
+  function flipCard(card: SafetyCard) {
+    if (
+      !started ||
+      locked ||
+      finished ||
+      flippedIds.includes(card.id) ||
+      matchedPairIds.includes(card.pairId)
+    )
+      return
 
-    const nextFoundIds = [...foundIds, id]
-    setFoundIds(nextFoundIds)
-    if (nextFoundIds.length === SAFETY_HAZARDS.length) {
-      setFinished(true)
+    if (flippedIds.length === 0) {
+      setFlippedIds([card.id])
+      return
     }
+
+    setLocked(true)
+    setMoves((current) => current + 1)
+    setFlippedIds((current) => [...current, card.id])
   }
 
-  function restart() {
-    setFoundIds([])
+  function start() {
+    setDeck(createSafetyDeck(true))
+    setFlippedIds([])
+    setMatchedPairIds([])
+    setMoves(0)
+    setLocked(false)
     setFinished(false)
+    setStarted(true)
   }
+
+  useEffect(() => {
+    if (flippedIds.length !== 2) return
+
+    const [firstCard, secondCard] = flippedIds.map((id) =>
+      deck.find((card) => card.id === id)
+    )
+    if (!firstCard || !secondCard) return
+
+    const matched =
+      firstCard.pairId === secondCard.pairId &&
+      firstCard.kind !== secondCard.kind
+    const timer = window.setTimeout(
+      () => {
+        if (matched) {
+          setMatchedPairIds((current) => {
+            const next = [...current, firstCard.pairId]
+            if (next.length === SAFETY_PAIRS.length) setFinished(true)
+            return next
+          })
+        }
+        setFlippedIds([])
+        setLocked(false)
+      },
+      matched ? 450 : 850
+    )
+
+    return () => window.clearTimeout(timer)
+  }, [deck, flippedIds])
 
   return (
     <section className="grid gap-5">
@@ -1202,44 +1495,112 @@ function SafetyInspectorGame() {
         accent="#9a3d16"
         items={[
           {
-            label: 'จุดเสี่ยง',
-            value: `${foundIds.length}/${SAFETY_HAZARDS.length}`,
+            label: 'จับคู่แล้ว',
+            value: `${matchedPairIds.length}/${SAFETY_PAIRS.length}`,
           },
-          { label: 'ระดับตรวจครบ', value: complete ? 'ผ่าน' : 'กำลังตรวจ' },
-          { label: 'คะแนน', value: `${foundIds.length * 20}` },
+          { label: 'จำนวนครั้ง', value: `${moves}` },
+          { label: 'คะแนน', value: `${score}` },
         ]}
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <OfficeScene
-          foundIds={foundIds}
-          hotspots={SAFETY_HAZARDS}
-          onFindHotspot={findHazard}
-          tone="safety"
-        />
-        <GameInstructionPanel
-          actionLabel="เริ่มตรวจใหม่"
-          icon={<IconShieldCheck aria-hidden="true" className="size-5" />}
-          onAction={restart}
-          title="ตรวจจุดเสี่ยง"
+      <div className="flex flex-col gap-4 border border-[#111111] bg-[#111111] p-4 text-white sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="flex items-start gap-3">
+          <span className="rounded-base grid size-10 shrink-0 place-items-center bg-[#ff9f6e] text-[#111111]">
+            <IconShieldCheck aria-hidden="true" className="size-5" />
+          </span>
+          <div>
+            <p className="font-bold text-[#ffb38d]">
+              จับคู่จุดเสี่ยงกับวิธีแก้
+            </p>
+            <p className="mt-1 text-sm leading-6 text-white/70">
+              เปิดได้ครั้งละ 2 ใบ จำตำแหน่งให้แม่น และใช้จำนวนครั้งให้น้อยที่สุด
+            </p>
+          </div>
+        </div>
+        <Button
+          className="shrink-0 bg-[#ff9f6e] font-bold text-[#111111] hover:bg-[#f28c58]"
+          disabled={started && !finished}
+          onClick={start}
+          type="button"
         >
-          คลิกตำแหน่งที่เสี่ยงต่ออุบัติเหตุในสำนักงาน
-          แล้วอ่านวิธีแก้ไขเพื่อจัดสภาพแวดล้อมให้ปลอดภัยขึ้น
-        </GameInstructionPanel>
+          <IconPlayerPlay data-icon="inline-start" />
+          {finished ? 'สับไพ่ใหม่' : 'เริ่มจับคู่'}
+        </Button>
       </div>
 
-      <FoundFeedback
-        emptyText="คลิกจุดเสี่ยงในภาพเพื่อดูวิธีแก้ไข"
-        foundIds={foundIds}
-        hotspots={SAFETY_HAZARDS}
-      />
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        {deck.map((card, index) => {
+          const flipped = flippedIds.includes(card.id)
+          const matched = matchedPairIds.includes(card.pairId)
+          const visible = flipped || matched
+
+          return (
+            <button
+              aria-label={visible ? card.text : `ไพ่ปิดใบที่ ${index + 1}`}
+              className={cn(
+                'relative min-h-44 border border-[#111111] p-3 text-center transition duration-200 focus-visible:ring-2 focus-visible:ring-[#ff9f6e] focus-visible:ring-offset-2 focus-visible:outline-none',
+                visible && card.kind === 'hazard' && 'bg-[#fff0ea]',
+                visible && card.kind === 'solution' && 'bg-[#effff3]',
+                !visible &&
+                  'bg-[#111111] text-white hover:-translate-y-1 hover:bg-[#292929]',
+                matched && 'border-2 border-[#168542]'
+              )}
+              disabled={!started || locked || matched}
+              key={card.id}
+              onClick={() => flipCard(card)}
+              type="button"
+            >
+              {visible ? (
+                <span className="grid h-full content-between gap-4">
+                  <span
+                    className={cn(
+                      'rounded-base mx-auto px-2 py-1 text-xs font-bold',
+                      card.kind === 'hazard'
+                        ? 'bg-[#ff9f6e] text-[#55210b]'
+                        : 'bg-[#5df591] text-[#173d2a]'
+                    )}
+                  >
+                    {card.kind === 'hazard' ? 'จุดเสี่ยง' : 'วิธีแก้'}
+                  </span>
+                  <span className="text-sm leading-6 font-bold">
+                    {card.text}
+                  </span>
+                  {matched ? (
+                    <IconCheck
+                      aria-hidden="true"
+                      className="mx-auto size-5 text-[#168542]"
+                    />
+                  ) : (
+                    <span className="h-5" />
+                  )}
+                </span>
+              ) : (
+                <span className="grid h-full place-items-center">
+                  {started ? (
+                    <span className="text-4xl font-bold text-[#ff9f6e]">?</span>
+                  ) : (
+                    <IconLock
+                      aria-hidden="true"
+                      className="size-7 text-white/55"
+                    />
+                  )}
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </section>
 
       {finished ? (
         <GameResult
-          actionLabel="ตรวจอีกรอบ"
-          detail="ตรวจพบจุดเสี่ยงครบแล้ว พร้อมนำรายการนี้ไปทำ safety walk ในพื้นที่จริง"
-          onRestart={restart}
-          score={foundIds.length * 20}
+          actionLabel="จับคู่อีกรอบ"
+          detail={
+            moves <= 8
+              ? 'ความจำยอดเยี่ยม จับคู่จุดเสี่ยงกับวิธีควบคุมได้อย่างแม่นยำ'
+              : 'จับคู่ครบแล้ว ลองเล่นอีกครั้งเพื่อจำวิธีควบคุมให้ได้เร็วขึ้น'
+          }
+          onRestart={start}
+          score={score}
           title="สรุป Safety Inspector"
         />
       ) : null}
