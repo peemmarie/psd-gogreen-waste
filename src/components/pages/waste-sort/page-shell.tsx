@@ -1,12 +1,21 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 
-import { IconArrowRight, IconLeaf } from '@tabler/icons-react'
+import { IconArrowRight, IconLeaf, IconMenu2, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { Button } from '~/components/ui/button'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '~/components/ui/sheet'
 import { cn } from '~/lib/utils'
 
 type WasteSortPageShellProps = {
@@ -22,6 +31,7 @@ const NAVIGATION_ITEMS = [
 
 export function WasteSortPageShell({ children }: WasteSortPageShellProps) {
   const pathname = usePathname()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   function isNavigationActive(href: string) {
     if (href === '/learning') {
@@ -68,7 +78,7 @@ export function WasteSortPageShell({ children }: WasteSortPageShellProps) {
             })}
           </nav>
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="hidden items-center justify-end gap-2 md:flex">
             <Button
               className="bg-[#5df591] px-5 font-bold text-[#111111] hover:bg-[#49db7b]"
               nativeButton={false}
@@ -78,6 +88,89 @@ export function WasteSortPageShell({ children }: WasteSortPageShellProps) {
               <IconArrowRight data-icon="inline-end" />
             </Button>
           </div>
+
+          <Sheet onOpenChange={setIsMobileMenuOpen} open={isMobileMenuOpen}>
+            <SheetTrigger
+              render={
+                <Button
+                  aria-label="เปิดเมนูหลัก"
+                  className="border-[#111111] bg-white font-bold text-[#111111] shadow-none hover:bg-[#f7f8f3] md:hidden"
+                  variant="outline"
+                />
+              }
+            >
+              <IconMenu2 aria-hidden="true" data-icon="inline-start" />
+              เมนู
+            </SheetTrigger>
+
+            <SheetContent
+              className="w-[min(88vw,22rem)] gap-0 border-l-2 border-[#111111] bg-[#f7f8f3] p-0 sm:max-w-[22rem]"
+              showCloseButton={false}
+              side="right"
+            >
+              <SheetHeader className="relative gap-3 border-b-2 border-[#111111] bg-white p-5 pr-16 text-left">
+                <div className="flex items-center gap-3">
+                  <span className="rounded-base flex size-10 items-center justify-center bg-[#111111] text-[#5df591]">
+                    <IconLeaf aria-hidden="true" />
+                  </span>
+                  <span className="font-bold">PSD GreenHub</span>
+                </div>
+                <SheetTitle className="text-2xl text-[#111111]">
+                  ไปที่ไหนต่อดี?
+                </SheetTitle>
+                <SheetDescription className="text-[#4d5053]">
+                  เลือกเรียนรู้ ค้นหาวิธีแยกขยะ หรือเริ่มภารกิจสีเขียว
+                </SheetDescription>
+                <SheetClose asChild>
+                  <Button
+                    aria-label="ปิดเมนูหลัก"
+                    className="absolute top-4 right-4 border-[#111111] bg-white text-[#111111] shadow-none hover:bg-[#f7f8f3]"
+                    size="icon"
+                    variant="outline"
+                  >
+                    <IconX aria-hidden="true" data-icon="inline-start" />
+                  </Button>
+                </SheetClose>
+              </SheetHeader>
+
+              <nav
+                aria-label="เมนูหลักบนมือถือ"
+                className="flex flex-1 flex-col gap-3 overflow-y-auto p-5"
+              >
+                {NAVIGATION_ITEMS.map((item) => {
+                  const isActive = isNavigationActive(item.href)
+
+                  return (
+                    <Link
+                      aria-current={isActive ? 'page' : undefined}
+                      className={cn(
+                        'neo-flat flex min-h-12 items-center justify-between bg-white px-4 py-3 font-bold text-[#111111] transition-[background-color,transform,box-shadow] hover:bg-[#e8f2df] focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-2 focus-visible:outline-none',
+                        isActive && 'bg-[#5df591] shadow-[4px_4px_0_0_#111111]'
+                      )}
+                      href={item.href}
+                      key={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <span>{item.label}</span>
+                      <IconArrowRight aria-hidden="true" />
+                    </Link>
+                  )
+                })}
+              </nav>
+
+              <div className="border-t-2 border-[#111111] bg-white p-5">
+                <Button
+                  className="h-12 w-full bg-[#5df591] text-base font-bold text-[#111111] hover:bg-[#49db7b]"
+                  nativeButton={false}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  render={<Link href="/game/waste-sort" />}
+                >
+                  เริ่มเกมแยกขยะ 4 สี
+                  <IconArrowRight data-icon="inline-end" />
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
