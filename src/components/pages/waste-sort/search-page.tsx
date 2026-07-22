@@ -124,42 +124,6 @@ function BinGuide() {
           </div>
         ))}
       </div>
-      <div className="neo-card mt-8 p-5 sm:p-6">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-[#2e7047]">
-              อ่านแบบวิชาการ เข้าใจง่าย
-            </p>
-            <h2 className="mt-1 text-2xl font-bold">บทเรียนที่เชื่อมกับเกม</h2>
-          </div>
-          <Button
-            className="w-fit bg-[#216c45] hover:bg-[#185437]"
-            nativeButton={false}
-            render={<Link href="/game" />}
-          >
-            ไปที่ Learning Platform
-            <IconArrowRight data-icon="inline-end" />
-          </Button>
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          {LEARNING_MODULES.slice(0, 3).map((module) => (
-            <article className="neo-surface bg-[#f7fbf4] p-4" key={module.id}>
-              <div className="flex flex-wrap gap-2 text-xs font-bold">
-                <span className="rounded-base bg-[#dcefd5] px-2.5 py-1 text-[#216c45]">
-                  {module.duration}
-                </span>
-                <span className="rounded-base bg-[#fff3a8] px-2.5 py-1 text-[#604800]">
-                  {module.level}
-                </span>
-              </div>
-              <h3 className="mt-3 font-bold">{module.title}</h3>
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#557164]">
-                {module.academicNote}
-              </p>
-            </article>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }
